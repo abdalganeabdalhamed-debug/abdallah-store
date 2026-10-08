@@ -154,12 +154,11 @@
         <p id="auth-status"></p>
     </div>
 
-    <!-- كود برمجة السكربت والاتصال بقاعدة البيانات -->
+    <!-- كود برمجة السكربت والاتصال بقاعدة البيانات بالمفتاح الجديد -->
     <script>
-        const SUPABASE_URL = 'https://npuljhidfkrznkxhslsy.supabase.co';
-        // المفتاح العام (Public Anon Key) الصحيح والمحدث لمشروعك
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wdWxqaGlkZmtyem5reGhzbHN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwNTU4NzIsImV4cCI6MjA2MzYzMTg3Mn0.6gycigSkV72C6wFNN_BrVg_CR8KRadd_Placeholder';
-        const _supabase = supabase.createClient(SUPABASE_URL, 'Sb_publishable_6gycigSkV72C6wFNN_BrVg_CR8KRadd');
+        const SUPABASE_URL = 'https://xbwikqfkinusoxjujkpw.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_nIPPd4Z2GGdVrD6WCQUPJQ_3oEXbfTA';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function handleSignUp() {
             const name = document.getElementById('su-name').value.trim();
@@ -187,7 +186,7 @@
                 statusEl.innerText = 'خطأ في الإنشاء: ' + error.message;
             } else {
                 statusEl.style.color = '#2ecc71';
-                statusEl.innerText = 'تم إنشاء الحساب! تحقق من إيميلك.';
+                statusEl.innerText = 'تم إنشاء الحساب! تحقق من إيميلك وضع الرمز أدناه.';
                 document.getElementById('auth-forms').style.display = 'none';
                 document.getElementById('otp-email').value = email;
                 document.getElementById('otp-section').style.display = 'block';
@@ -198,6 +197,15 @@
             const email = document.getElementById('otp-email').value.trim();
             const token = document.getElementById('otp-token').value.trim();
             const statusEl = document.getElementById('auth-status');
+
+            if (!email || !token) {
+                statusEl.style.color = '#ff6b6b';
+                statusEl.innerText = 'الرجاء إدخال الإيميل ورمز التحقق!';
+                return;
+            }
+
+            statusEl.style.color = '#f1c40f';
+            statusEl.innerText = 'جاري التحقق من الرمز...';
 
             const { data, error } = await _supabase.auth.verifyOtp({
                 email: email,
@@ -224,6 +232,15 @@
             const password = document.getElementById('si-pass').value.trim();
             const statusEl = document.getElementById('auth-status');
 
+            if (!email || !password) {
+                statusEl.style.color = '#ff6b6b';
+                statusEl.innerText = 'الرجاء إدخال الإيميل وكلمة السر!';
+                return;
+            }
+
+            statusEl.style.color = '#f1c40f';
+            statusEl.innerText = 'جاري تسجيل الدخول...';
+
             const { data, error } = await _supabase.auth.signInWithPassword({
                 email: email,
                 password: password
@@ -247,7 +264,7 @@
             await _supabase.auth.signOut();
             document.getElementById('wallet-section').style.display = 'none';
             document.getElementById('auth-forms').style.display = 'block';
-            document.getElementById('auth-status').innerText = 'تم تسجيل الخروج.';
+            statusEl.innerText = '';
         }
     </script>
 </body>
