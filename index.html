@@ -96,7 +96,7 @@
         <div id="auth-forms">
             <!-- إنشاء حساب -->
             <div id="signup-box">
-                <h3 style="color: #27ae60; font-size: 18px;">إنشاء حساب جديد</h3>
+                <h3 style="color: #27ae60; font-size: 18px;">إنشاء حساب جديد والدخول الفوري</h3>
                 <div class="form-group">
                     <label>الاسم الكامل:</label>
                     <input type="text" id="su-name" placeholder="أدخل اسمك">
@@ -109,7 +109,7 @@
                     <label>كلمة السر:</label>
                     <input type="password" id="su-pass" placeholder="6 رموز أو أرقام على الأقل">
                 </div>
-                <button class="btn-signup" onclick="handleSignUp()">تسجيل حساب جديد</button>
+                <button class="btn-signup" onclick="handleSignUp()">تسجيل ودخول للمحفظة فوراً</button>
             </div>
 
             <hr>
@@ -159,8 +159,9 @@
             }
 
             statusEl.style.color = '#f1c40f';
-            statusEl.innerText = 'جاري إنشاء الحساب...';
+            statusEl.innerText = 'جاري إنشاء الحساب والدخول...';
 
+            // إنشاء الحساب
             const { data, error } = await _supabase.auth.signUp({
                 email: email,
                 password: password,
@@ -171,8 +172,24 @@
                 statusEl.style.color = '#ff6b6b';
                 statusEl.innerText = 'خطأ: ' + error.message;
             } else {
-                statusEl.style.color = '#2ecc71';
-                statusEl.innerText = 'تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول مباشرة.';
+                // تسجيل الدخول تلقائياً بعد الإنشاء مباشرة
+                const { error: loginError } = await _supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (!loginError) {
+                    statusEl.style.color = '#2ecc71';
+                    statusEl.innerText = 'تم إنشاء الحساب والدخول بنجاح!';
+                    setTimeout(() => {
+                        document.getElementById('auth-forms').style.display = 'none';
+                        document.getElementById('wallet-section').style.display = 'block';
+                        statusEl.innerText = '';
+                    }, 600);
+                } else {
+                    statusEl.style.color = '#2ecc71';
+                    statusEl.innerText = 'تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول من الأسفل.';
+                }
             }
         }
 
