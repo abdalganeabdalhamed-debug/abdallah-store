@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر عبد الله قرينات - المحفظة الآمنة</title>
+    <title>متجر عبد الله قرينات - لوحة الإدارة والمحفظة</title>
     <style>
         body {
             font-family: Tahoma, sans-serif;
@@ -13,25 +13,24 @@
             color: #e0e0e0;
         }
         .container {
-            max-width: 450px;
-            margin: 40px auto;
+            max-width: 600px;
+            margin: 20px auto;
             background: #1e1e1e;
-            padding: 30px;
+            padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.6);
             border: 1px solid #333;
         }
-        h2 {
+        h2, h3 {
             text-align: center;
             color: #ffffff;
-            margin-bottom: 25px;
         }
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 15px;
         }
         label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             font-weight: bold;
             color: #b0b0b0;
         }
@@ -51,32 +50,44 @@
             outline: none;
         }
         button {
-            width: 100%;
-            padding: 12px;
+            padding: 10px 15px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 15px;
             color: white;
             transition: opacity 0.3s;
         }
-        button:hover {
-            opacity: 0.9;
-        }
-        .btn-main { background-color: #27ae60; }
-        .btn-logout { background-color: #c0392b; margin-top: 15px; }
-        #wallet-section {
+        button:hover { opacity: 0.9; }
+        .btn-main { background-color: #27ae60; width: 100%; padding: 12px; }
+        .btn-danger { background-color: #c0392b; }
+        .btn-logout { background-color: #7f8c8d; width: 100%; margin-top: 20px; }
+        
+        #dashboard-section {
             display: none;
-            text-align: center;
         }
         .balance-box {
             background: #2b2b2b;
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #444;
-            margin: 20px 0;
+            margin: 15px 0;
+            text-align: center;
             font-size: 18px;
+        }
+        .item-card {
+            background: #252525;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-info {
+            font-size: 14px;
         }
         #status-msg {
             text-align: center;
@@ -91,59 +102,95 @@
     <div class="container">
         <h2>متجر عبد الله قرينات</h2>
 
-        <!-- واجهة التسجيل والدخول المباشر -->
+        <!-- واجهة تسجيل الدخول -->
         <div id="auth-box">
+            <h3 style="color: #2980b9; font-size: 18px; margin-bottom: 20px;">تسجيل الدخول للمتجر</h3>
             <div class="form-group">
                 <label>اسم المستخدم أو البريد:</label>
-                <input type="text" id="username" placeholder="أدخل اسمك أو بريدك">
+                <input type="text" id="username" placeholder="أدخل اسمك أو بريدك القديم">
             </div>
             <div class="form-group">
                 <label>كلمة السر:</label>
-                <input type="password" id="password" placeholder="أدخل كلمة السر">
+                <input type="password" id="password" placeholder="كلمة السر">
             </div>
-            <button class="btn-main" onclick="openWallet()">دخول / إنترنت مباشر للمحفظة</button>
+            <button class="btn-main" onclick="loginSystem()">دخول للمتجر والمحفظة</button>
         </div>
 
-        <!-- واجهة المحفظة والرصيد -->
-        <div id="wallet-section">
+        <!-- لوحة التحكم الكاملة (المحفظة + المنتجات والروابط للتيك توك وغيرها) -->
+        <div id="dashboard-section">
             <h3 style="color: #e67e22;">مرحباً بك، <span id="user-display" style="color: #fff;"></span></h3>
+            
             <div class="balance-box">
-                رصيد المحفظة الحالي: <br><span id="balance-display" style="color: #27ae60; font-weight: bold; font-size: 24px;">0.00</span> دولار
+                رصيد المحفظة: <span id="balance-display" style="color: #27ae60; font-weight: bold;">50.00</span> دولار
             </div>
-            <p style="font-size: 13px; color: #aaa;">يمكنك تعديل رصيدك وإدارته بكل سهولة.</p>
-            <button class="btn-logout" onclick="logoutWallet()">تسجيل الخروج</button>
+
+            <hr style="border: 0; height: 1px; background: #333; margin: 20px 0;">
+
+            <h3 style="text-align: right; font-size: 16px; color: #3498db;">إدارة المنتجات والروابط (تيك توك وغيرها)</h3>
+            <p style="font-size: 12px; color: #aaa; text-align: right;">يمكنك حذف أي عنصر قديم أو غير مطلوب فوراً:</p>
+
+            <!-- قائمة العناصر والروابط -->
+            <div id="items-list">
+                <div class="item-card" id="item-1">
+                    <div class="item-info">
+                        <strong>خدمة شحن تيك توك (رابط 1)</strong><br>
+                        <span style="font-size: 12px; color: #888;">https://tiktok.com/@example</span>
+                    </div>
+                    <button class="btn-danger" onclick="deleteItem('item-1')">حذف</button>
+                </div>
+
+                <div class="item-card" id="item-2">
+                    <div class="item-info">
+                        <strong>خدمة تفعيل برامج الموبايل</strong><br>
+                        <span style="font-size: 12px; color: #888;">أداة الصيانة السريعة</span>
+                    </div>
+                    <button class="btn-danger" onclick="deleteItem('item-2')">حذف</button>
+                </div>
+            </div>
+
+            <button class="btn-logout" onclick="logoutSystem()">تسجيل الخروج</button>
         </div>
 
         <p id="status-msg"></p>
     </div>
 
     <script>
-        function openWallet() {
+        function loginSystem() {
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value.trim();
             const status = document.getElementById('status-msg');
 
             if (!user || !pass) {
                 status.style.color = '#ff6b6b';
-                status.innerText = 'الرجاء ملء جميع الحقول!';
+                status.innerText = 'الرجاء إدخال اسم المستخدم وكلمة السر!';
                 return;
             }
 
             status.style.color = '#f1c40f';
-            status.innerText = 'جاري فتح المحفظة...';
+            status.innerText = 'جاري فتح لوحة التحكم...';
 
             setTimeout(() => {
-                // إظهار المحفظة وإخفاء نموذج الدخول
+                // إخفاء نموذج الدخول وإظهار لوحة التحكم والروابط كاملة
                 document.getElementById('auth-box').style.display = 'none';
-                document.getElementById('wallet-section').style.display = 'block';
+                document.getElementById('dashboard-section').style.display = 'block';
                 document.getElementById('user-display').innerText = user;
-                document.getElementById('balance-display').innerText = '10.00'; // رصيد تجريبي افتراضي جاهز
                 status.innerText = '';
-            }, 500);
+            }, 400);
         }
 
-        function logoutWallet() {
-            document.getElementById('wallet-section').style.display = 'none';
+        function deleteItem(itemId) {
+            const element = document.getElementById(itemId);
+            if (element) {
+                element.style.transition = 'opacity 0.3s';
+                element.style.opacity = '0';
+                setTimeout(() => {
+                    element.remove();
+                }, 300);
+            }
+        }
+
+        function logoutSystem() {
+            document.getElementById('dashboard-section').style.display = 'none';
             document.getElementById('auth-box').style.display = 'block';
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
