@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متجري الإلكتروني</title>
-    <!-- مكتبة Supabase للربط -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; direction: rtl; }
         .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         h1, h2 { color: #333; }
-        input, button { padding: 10px; margin: 5px 0; font-size: 16px; width: 100%; box-sizing: border-box; }
+        input, button { padding: 10px; margin: 8px 0; font-size: 16px; width: 100%; box-sizing: border-box; }
         button { background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
         button:hover { background-color: #218838; }
+        .secondary-btn { background-color: #6c757d; }
+        .secondary-btn:hover { background-color: #5a6268; }
         .hidden { display: none; }
         .product-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; background: #fafafa; }
         .wallet-box { background: #e9ecef; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-weight: bold; }
+        .link-text { color: #007bff; cursor: pointer; text-align: center; margin-top: 10px; display: block; }
+        .link-text:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -23,20 +26,31 @@
 <div class="container">
     <h1>متجري الإلكتروني</h1>
 
-    <!-- قسم تسجيل الدخول / إنشاء حساب -->
-    <div id="auth-section">
-        <h2>تسجيل الدخول / حساب جديد</h2>
-        <input type="email" id="email" placeholder="البريد الإلكتروني">
-        <input type="password" id="password" placeholder="كلمة المرور">
-        <button onclick="handleAuth('login')">تسجيل الدخول</button>
-        <button onclick="handleAuth('signup')" style="background-color: #007bff;">إنشاء حساب جديد</button>
-        <p id="auth-msg" style="color: red;"></p>
+    <!-- قسم تسجيل الدخول -->
+    <div id="login-section">
+        <h2>تسجيل الدخول</h2>
+        <input type="email" id="login-email" placeholder="البريد الإلكتروني">
+        <input type="password" id="login-password" placeholder="كلمة المرور">
+        <button onclick="loginUser()">تسجيل الدخول</button>
+        <p id="login-msg" style="color: red;"></p>
+        <span class="link-text" onclick="showSignup()">ليس لديك حساب؟ اضغط هنا لإنشاء حساب جديد</span>
     </div>
 
-    <!-- قسم المتجر والمنتجات (يظهر بعد تسجيل الدخول) -->
+    <!-- قسم إنشاء حساب جديد (صفحة منفصلة تظهر عند الضغط) -->
+    <div id="signup-section" class="hidden">
+        <h2>إنشاء حساب جديد</h2>
+        <input type="text" id="signup-name" placeholder="الاسم الكامل">
+        <input type="email" id="signup-email" placeholder="البريد الإلكتروني">
+        <input type="password" id="signup-password" placeholder="كلمة المرور">
+        <button onclick="signupUser()" style="background-color: #007bff;">تأكيد إنشاء الحساب</button>
+        <p id="signup-msg" style="color: red;"></p>
+        <button class="secondary-btn" onclick="showLogin()">العودة لتسجيل الدخول</button>
+    </div>
+
+    <!-- قسم المتجر والمنتجات (يظهر بعد تسجيل الدخول الناجح) -->
     <div id="store-section" class="hidden">
         <div class="wallet-box">
-            البريد المسجل: <span id="user-email-display"></span> | رصيد المحفظة: $<span id="user-balance">0.00</span>
+            مرحباً، <span id="user-name-display"></span> | البريد: <span id="user-email-display"></span> | رصيد المحفظة: $<span id="user-balance">0.00</span>
             <button onclick="logout()" style="background-color: #dc3545; width: auto; padding: 5px 10px; float: left;">تسجيل خروج</button>
         </div>
 
@@ -66,56 +80,81 @@
 </div>
 
 <script>
-    // إعدادات اتصال Supabase الجديدة
     const SUPABASE_URL = 'https://jsptynjktxfetyxebwvo.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_xCxX3NCHHcnTWywv9eudZg_mAfImIYD';
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     let currentUser = null;
 
-    async function handleAuth(type) {
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
-        const msgEl = document.getElementById('auth-msg');
+    // التنقل بين الشاشات
+    function showSignup() {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('signup-section').classList.remove('hidden');
+        document.getElementById('login-msg').innerText = '';
+    }
+
+    function showLogin() {
+        document.getElementById('signup-section').classList.add('hidden');
+        document.getElementById('login-section').classList.remove('hidden');
+        document.getElementById('signup-msg').innerText = '';
+    }
+
+    // عملية إنشاء حساب جديد
+    async function signupUser() {
+        const name = document.getElementById('signup-name').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value.trim();
+        const msgEl = document.getElementById('signup-msg');
+
+        if (!name || !email || !password) {
+            msgEl.innerText = 'الرجاء ملء جميع الحقول المطلوبة (الاسم، البريد، كلمة المرور)';
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from('store_users')
+            .insert([{ name: name, email: email, password: password, balance: 100.00 }]);
+
+        if (error) {
+            msgEl.innerText = 'خطأ في إنشاء الحساب (البريد مستخدم مسبقاً)';
+            console.error(error);
+        } else {
+            alert('تم إنشاء الحساب بنجاح! تم منحك رصيد تجريبي 100$. يمكنك تسجيل الدخول الآن.');
+            showLogin();
+        }
+    }
+
+    // عملية تسجيل الدخول
+    async function loginUser() {
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+        const msgEl = document.getElementById('login-msg');
 
         if (!email || !password) {
             msgEl.innerText = 'الرجاء إدخال البريد وكلمة المرور';
             return;
         }
 
-        if (type === 'signup') {
-            const { data, error } = await supabaseClient
-                .from('store_users')
-                .insert([{ email: email, password: password, balance: 100.00 }]); // رصيد هدية تجريبي 100$
+        const { data, error } = await supabaseClient
+            .from('store_users')
+            .select('*')
+            .eq('email', email)
+            .eq('password', password)
+            .single();
 
-            if (error) {
-                msgEl.innerText = 'خطأ في إنشاء الحساب (البريد مستخدم مسبقاً أو غير مسموح)';
-                console.error(error);
-            } else {
-                alert('تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.');
-                msgEl.innerText = '';
-            }
+        if (error || !data) {
+            msgEl.innerText = 'خطأ: البريد أو كلمة المرور غير صحيحة';
         } else {
-            const { data, error } = await supabaseClient
-                .from('store_users')
-                .select('*')
-                .eq('email', email)
-                .eq('password', password)
-                .single();
-
-            if (error || !data) {
-                msgEl.innerText = 'خطأ: البريد أو كلمة المرور غير صحيحة';
-            } else {
-                currentUser = data;
-                enterStore();
-            }
+            currentUser = data;
+            enterStore();
         }
     }
 
     function enterStore() {
-        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('signup-section').classList.add('hidden');
         document.getElementById('store-section').classList.remove('hidden');
+        document.getElementById('user-name-display').innerText = currentUser.name;
         document.getElementById('user-email-display').innerText = currentUser.email;
         document.getElementById('user-balance').innerText = currentUser.balance;
     }
@@ -123,9 +162,9 @@
     function logout() {
         currentUser = null;
         document.getElementById('store-section').classList.add('hidden');
-        document.getElementById('auth-section').classList.remove('hidden');
-        document.getElementById('email').value = '';
-        document.getElementById('password').value = '';
+        document.getElementById('login-section').classList.remove('hidden');
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-password').value = '';
     }
 
     async function buyItem(price) {
