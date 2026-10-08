@@ -282,42 +282,40 @@
     <div class="container">
         <h1>عبد الله قرينان</h1>
 
+        <!-- 1. واجهة تسجيل الدخول -->
         <div id="login-page">
             <p style="margin-bottom: 15px; color: #bbb;">قم بتسجيل الدخول للوصول للمتجر والمحفظة</p>
             
             <div id="login-error" class="error-msg">البريد أو كلمة السر غير صحيحة!</div>
             <div id="register-success" class="success-msg">تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.</div>
 
-            <form id="loginForm">
-                <div class="form-group">
-                    <input type="email" id="login-email" placeholder="ادخل البريد الالكتروني" required>
-                    <input type="password" id="login-password" placeholder="ادخل كلمة السر" required>
-                    <button type="submit" class="btn">تسجيل الدخول</button>
-                </div>
-            </form>
+            <div class="form-group">
+                <input type="email" id="login-email" placeholder="ادخل البريد الالكتروني">
+                <input type="password" id="login-password" placeholder="ادخل كلمة السر">
+                <button type="button" class="btn" onclick="handleLogin()">تسجيل الدخول</button>
+            </div>
 
-            <button class="btn btn-secondary" onclick="showRegisterPage()">إنشاء حساب جديد (Create Account)</button>
+            <button type="button" class="btn btn-secondary" onclick="showRegisterPage()">إنشاء حساب جديد (Create Account)</button>
         </div>
 
+        <!-- 2. واجهة إنشاء حساب جديد -->
         <div id="register-page" style="display: none;">
             <p style="margin-bottom: 15px; color: #bbb;">أدخل بياناتك لإنشاء حساب جديد</p>
             
-            <div id="reg-error" class="error-msg">يرجى ملء كافة الحقول بشكل صحيح أو البريد مستخدم مسبقاً!</div>
+            <div id="reg-error" class="error-msg">يرجى ملء كافة الحقول أو البريد مستخدم مسبقاً!</div>
 
-            <form id="registerForm">
-                <div class="form-group">
-                    <input type="text" id="reg-name" placeholder="الاسم الكامل" required>
-                    <input type="email" id="reg-email" placeholder="ادخل البريد الالكتروني" required>
-                    <input type="password" id="reg-password" placeholder="ادخل كلمة السر" required>
-                    <button type="submit" class="btn">إنشاء الحساب</button>
-                </div>
-            </form>
+            <div class="form-group">
+                <input type="text" id="reg-name" placeholder="الاسم الكامل">
+                <input type="email" id="reg-email" placeholder="ادخل البريد الالكتروني">
+                <input type="password" id="reg-password" placeholder="ادخل كلمة السر">
+                <button type="button" class="btn" onclick="handleRegister()">إنشاء الحساب</button>
+            </div>
 
-            <button class="btn btn-secondary" onclick="showLoginPage()">الرجوع لتسجيل الدخول</button>
+            <button type="button" class="btn btn-secondary" onclick="showLoginPage()">الرجوع لتسجيل الدخول</button>
         </div>
 
+        <!-- 3. واجهة المتجر -->
         <div id="store-page">
-            
             <div class="wallet-card">
                 <div class="wallet-title">مرحباً: <span id="user-name-display"></span></div>
                 <div class="wallet-balance">$<span id="balance">0.00</span></div>
@@ -368,59 +366,3 @@
                         <div class="item-icon" style="color: #f1c40f;">🎮</div>
                         <div class="item-details">
                             <div class="item-title">ببجي (PUBG Mobile)</div>
-                            <div class="item-price">شحن 2000 شدة - $120</div>
-                        </div>
-                    </div>
-                    <button class="btn-charge" onclick="chargeByPlayerID('ببجي شدات', 120)">شحن</button>
-                </div>
-            </div>
-
-            <p style="margin-top: 20px; font-size: 13px; color: #aaa;">شكراً عملائنا الكرام نحن دوماً في خدماتكم للتواصل:</p>
-
-            <div class="social-btns">
-                <a href="https://wa.me/" target="_blank" class="btn-social btn-wa">واتساب (WhatsApp)</a>
-                <a href="https://facebook.com/" target="_blank" class="btn-social btn-fb">فيسبوك (Facebook)</a>
-            </div>
-
-            <div class="footer">والسلام</div>
-        </div>
-    </div>
-
-    <div id="tiktok-modal" class="modal">
-        <div class="modal-content">
-            <h3 style="color: #38ef7d; margin-bottom: 15px;">شحن حساب تيك توك</h3>
-            <div class="form-group">
-                <input type="text" id="tt-username" placeholder="ادخل اليوزر نيم (Username)">
-                <input type="password" id="tt-password" placeholder="ادخل كلمة السر (Password)">
-            </div>
-            <div class="modal-btns">
-                <button class="btn-confirm" onclick="confirmTikTokCharge()">تأكيد الشحن ($50)</button>
-                <button class="btn-cancel" onclick="closeTikTokModal()">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const SUPABASE_URL = 'https://jsptynjktxfetyxebwvo.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_xCxX3NCHHcnTWywv9eudZg_mAfImIYD';
-        
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        let currentUser = null;
-
-        function showRegisterPage() {
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('register-page').style.display = 'block';
-            document.getElementById('login-error').style.display = 'none';
-        }
-
-        function showLoginPage() {
-            document.getElementById('register-page').style.display = 'none';
-            document.getElementById('login-page').style.display = 'block';
-            document.getElementById('reg-error').style.display = 'none';
-        }
-
-        // تسجيل حساب جديد برصيد افتراضي 0.00
-        document.getElementById('registerForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('reg-name').value.
