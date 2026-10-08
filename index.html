@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>عبد الله قرينان - متجر الشحن</title>
-    <!-- مكتبة Supabase للربط -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
@@ -44,7 +43,6 @@
             color: #38ef7d;
         }
 
-        /* --- نماذج الدخول وإنشاء الحساب --- */
         .form-group {
             display: flex;
             flex-direction: column;
@@ -105,7 +103,6 @@
             display: none;
         }
 
-        /* --- الصفحة الثانية: المتجر والمحفظة --- */
         #store-page {
             display: none;
         }
@@ -203,7 +200,6 @@
             cursor: pointer;
         }
 
-        /* نافذة التيك توك */
         .modal {
             display: none;
             position: fixed;
@@ -286,7 +282,6 @@
     <div class="container">
         <h1>عبد الله قرينان</h1>
 
-        <!-- 1. واجهة تسجيل الدخول الرئيسية -->
         <div id="login-page">
             <p style="margin-bottom: 15px; color: #bbb;">قم بتسجيل الدخول للوصول للمتجر والمحفظة</p>
             
@@ -304,7 +299,6 @@
             <button class="btn btn-secondary" onclick="showRegisterPage()">إنشاء حساب جديد (Create Account)</button>
         </div>
 
-        <!-- 2. واجهة إنشاء حساب جديد -->
         <div id="register-page" style="display: none;">
             <p style="margin-bottom: 15px; color: #bbb;">أدخل بياناتك لإنشاء حساب جديد</p>
             
@@ -322,7 +316,6 @@
             <button class="btn btn-secondary" onclick="showLoginPage()">الرجوع لتسجيل الدخول</button>
         </div>
 
-        <!-- 3. الصفحة الثانية: متجر الشحن والمحفظة -->
         <div id="store-page">
             
             <div class="wallet-card">
@@ -333,8 +326,6 @@
             </div>
 
             <div class="store-grid">
-                
-                <!-- فري فاير -->
                 <div class="store-item">
                     <div class="item-info">
                         <div class="item-icon" style="color: #ff9f43;">🔥</div>
@@ -346,7 +337,6 @@
                     <button class="btn-charge" onclick="chargeByPlayerID('فري فاير', 100)">شحن</button>
                 </div>
 
-                <!-- تيك توك -->
                 <div class="store-item">
                     <div class="item-info">
                         <div class="item-icon">
@@ -362,7 +352,6 @@
                     <button class="btn-charge" onclick="openTikTokModal()">شحن</button>
                 </div>
 
-                <!-- إيمو -->
                 <div class="store-item">
                     <div class="item-info">
                         <div class="item-icon" style="color: #00a8ff;">💎</div>
@@ -374,7 +363,6 @@
                     <button class="btn-charge" onclick="chargeByPlayerID('إيمو', 150)">شحن</button>
                 </div>
 
-                <!-- ببجي -->
                 <div class="store-item">
                     <div class="item-info">
                         <div class="item-icon" style="color: #f1c40f;">🎮</div>
@@ -385,7 +373,6 @@
                     </div>
                     <button class="btn-charge" onclick="chargeByPlayerID('ببجي شدات', 120)">شحن</button>
                 </div>
-
             </div>
 
             <p style="margin-top: 20px; font-size: 13px; color: #aaa;">شكراً عملائنا الكرام نحن دوماً في خدماتكم للتواصل:</p>
@@ -397,10 +384,8 @@
 
             <div class="footer">والسلام</div>
         </div>
-
     </div>
 
-    <!-- نافذة تيك توك -->
     <div id="tiktok-modal" class="modal">
         <div class="modal-content">
             <h3 style="color: #38ef7d; margin-bottom: 15px;">شحن حساب تيك توك</h3>
@@ -415,7 +400,6 @@
         </div>
     </div>
 
-    <!-- كود الجافا سكريبت متصل مع Supabase -->
     <script>
         const SUPABASE_URL = 'https://jsptynjktxfetyxebwvo.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_xCxX3NCHHcnTWywv9eudZg_mAfImIYD';
@@ -423,7 +407,6 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
 
-        // التنقل بين الصفحات
         function showRegisterPage() {
             document.getElementById('login-page').style.display = 'none';
             document.getElementById('register-page').style.display = 'block';
@@ -436,140 +419,8 @@
             document.getElementById('reg-error').style.display = 'none';
         }
 
-        // 1. تسجيل حساب جديد وحفظه في Supabase
+        // تسجيل حساب جديد برصيد افتراضي 0.00
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const name = document.getElementById('reg-name').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value.trim();
-            const regError = document.getElementById('reg-error');
-
-            if (name && email && password) {
-                const { error } = await supabaseClient
-                    .from('store_users')
-                    .insert([{ name: name, email: email, password: password, balance: 100.00 }]); // يمنحه رصيد ابتدائي 100$
-
-                if (error) {
-                    regError.style.display = 'block';
-                    console.error(error);
-                } else {
-                    regError.style.display = 'none';
-                    document.getElementById('registerForm').reset();
-                    showLoginPage();
-                    document.getElementById('register-success').style.display = 'block';
-                }
-            } else {
-                regError.style.display = 'block';
-            }
-        });
-
-        // 2. تسجيل الدخول والتحقق من Supabase
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-            const loginError = document.getElementById('login-error');
-
-            const { data, error } = await supabaseClient
-                .from('store_users')
-                .select('*')
-                .eq('email', email)
-                .eq('password', password)
-                .single();
-
-            if (error || !data) {
-                loginError.style.display = 'block';
-            } else {
-                currentUser = data;
-                loginError.style.display = 'none';
-                document.getElementById('login-page').style.display = 'none';
-                document.getElementById('store-page').style.display = 'block';
-                document.getElementById('user-name-display').textContent = currentUser.name;
-                document.getElementById('balance').textContent = Number(currentUser.balance).toFixed(2);
-            }
-        });
-
-        function logout() {
-            currentUser = null;
-            document.getElementById('store-page').style.display = 'none';
-            document.getElementById('login-page').style.display = 'block';
-            document.getElementById('loginForm').reset();
-        }
-
-        // تحديث الرصيد في قاعدة البيانات عند الشراء أو الإيداع
-        async function updateBalanceInDB(newBalance) {
-            const { error } = await supabaseClient
-                .from('store_users')
-                .update({ balance: newBalance })
-                .eq('id', currentUser.id);
-
-            if (error) {
-                alert('حدث خطأ في تحديث الرصيد بالسيرفر!');
-                console.error(error);
-                return false;
-            }
-            currentUser.balance = newBalance;
-            document.getElementById('balance').textContent = Number(newBalance).toFixed(2);
-            return true;
-        }
-
-        async function addMoney() {
-            let amount = prompt("ادخل المبلغ المراد إضافته للمحفظة ($):", "1000");
-            if (amount && !isNaN(amount) && amount > 0) {
-                let newBal = Number(currentUser.balance) + parseFloat(amount);
-                let success = await updateBalanceInDB(newBal);
-                if (success) {
-                    alert("تم إضافة $" + amount + " إلى محفظتك بنجاح!");
-                }
-            }
-        }
-
-        async function chargeByPlayerID(itemName, price) {
-            if (Number(currentUser.balance) >= price) {
-                let id = prompt("ادخل الـ ID الخاص بك في " + itemName + ":");
-                if (id) {
-                    let newBal = Number(currentUser.balance) - price;
-                    let success = await updateBalanceInDB(newBal);
-                    if (success) {
-                        alert("تم طلب شحن " + itemName + " للآيدي (" + id + ") بنجاح!\nالرصيد المتبقي: $" + newBal.toFixed(2));
-                    }
-                }
-            } else {
-                alert("عذراً! رصيدك غير كافٍ لشحن " + itemName + ". قم بإيداع رصيد أولاً.");
-            }
-        }
-
-        function openTikTokModal() {
-            if (Number(currentUser.balance) >= 50) {
-                document.getElementById('tiktok-modal').style.display = 'flex';
-            } else {
-                alert("عذراً! رصيدك غير كافٍ لشحن تيك توك ($50). قم بإيداع رصيد أولاً.");
-            }
-        }
-
-        function closeTikTokModal() {
-            document.getElementById('tiktok-modal').style.display = 'none';
-            document.getElementById('tt-username').value = '';
-            document.getElementById('tt-password').value = '';
-        }
-
-        async function confirmTikTokCharge() {
-            let user = document.getElementById('tt-username').value;
-            let pass = document.getElementById('tt-password').value;
-
-            if (user !== "" && pass !== "") {
-                let newBal = Number(currentUser.balance) - 50;
-                let success = await updateBalanceInDB(newBal);
-                if (success) {
-                    closeTikTokModal();
-                    alert("تم إرسال طلب الشحن لحساب تيك توك (@" + user + ") بنجاح!\nالرصيد المتبقي: $" + newBal.toFixed(2));
-                }
-            } else {
-                alert("يرجى إدخال اليوزر نيم وكلمة السر لإتمام الشحن!");
-            }
-        }
-    </script>
-</body>
-</html>
+            const name = document.getElementById('reg-name').value.
