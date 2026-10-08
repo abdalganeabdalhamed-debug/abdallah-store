@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر عبد الله قرينات - بوابة الشحن والمحفظة</title>
-    <!-- مكتبة Supabase للربط -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>متجر عبد الله قرينات - المحفظة الآمنة</title>
     <style>
         body {
             font-family: Tahoma, sans-serif;
@@ -16,24 +14,24 @@
         }
         .container {
             max-width: 450px;
-            margin: 0 auto;
+            margin: 40px auto;
             background: #1e1e1e;
-            padding: 25px;
+            padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
             border: 1px solid #333;
         }
         h2 {
             text-align: center;
             color: #ffffff;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             font-weight: bold;
             color: #b0b0b0;
         }
@@ -66,169 +64,90 @@
         button:hover {
             opacity: 0.9;
         }
-        .btn-signup { background-color: #27ae60; }
-        .btn-signin { background-color: #2980b9; }
-        hr {
-            border: 0;
-            height: 1px;
-            background: #333;
-            margin: 25px 0;
+        .btn-main { background-color: #27ae60; }
+        .btn-logout { background-color: #c0392b; margin-top: 15px; }
+        #wallet-section {
+            display: none;
+            text-align: center;
         }
-        #auth-status {
+        .balance-box {
+            background: #2b2b2b;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        #status-msg {
             text-align: center;
             margin-top: 15px;
             font-weight: bold;
             font-size: 14px;
-            line-height: 1.6;
-        }
-        #wallet-section {
-            display: none;
-            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <div class="container" id="main-container">
+    <div class="container">
         <h2>متجر عبد الله قرينات</h2>
 
-        <!-- النماذج الأساسية -->
-        <div id="auth-forms">
-            <!-- إنشاء حساب -->
-            <div id="signup-box">
-                <h3 style="color: #27ae60; font-size: 18px;">إنشاء حساب جديد والدخول الفوري</h3>
-                <div class="form-group">
-                    <label>الاسم الكامل:</label>
-                    <input type="text" id="su-name" placeholder="أدخل اسمك">
-                </div>
-                <div class="form-group">
-                    <label>البريد الإلكتروني:</label>
-                    <input type="email" id="su-email" placeholder="name@example.com">
-                </div>
-                <div class="form-group">
-                    <label>كلمة السر:</label>
-                    <input type="password" id="su-pass" placeholder="6 رموز أو أرقام على الأقل">
-                </div>
-                <button class="btn-signup" onclick="handleSignUp()">تسجيل ودخول للمحفظة فوراً</button>
+        <!-- واجهة التسجيل والدخول المباشر -->
+        <div id="auth-box">
+            <div class="form-group">
+                <label>اسم المستخدم أو البريد:</label>
+                <input type="text" id="username" placeholder="أدخل اسمك أو بريدك">
             </div>
-
-            <hr>
-
-            <!-- تسجيل الدخول -->
-            <div id="signin-box">
-                <h3 style="color: #2980b9; font-size: 18px;">تسجيل الدخول للمحفظة</h3>
-                <div class="form-group">
-                    <label>البريد الإلكتروني:</label>
-                    <input type="email" id="si-email" placeholder="name@example.com">
-                </div>
-                <div class="form-group">
-                    <label>كلمة السر:</label>
-                    <input type="password" id="si-pass" placeholder="كلمة السر الخاصة بك">
-                </div>
-                <button class="btn-signin" onclick="handleSignIn()">تسجيل الدخول</button>
+            <div class="form-group">
+                <label>كلمة السر:</label>
+                <input type="password" id="password" placeholder="أدخل كلمة السر">
             </div>
+            <button class="btn-main" onclick="openWallet()">دخول / إنترنت مباشر للمحفظة</button>
         </div>
 
-        <!-- واجهة المحفظة -->
+        <!-- واجهة المحفظة والرصيد -->
         <div id="wallet-section">
-            <h3 style="color: #e67e22;">مرحباً بك في محفظتك الآمنة</h3>
-            <p>تم تسجيل دخولك بنجاح إلى متجرك.</p>
-            <p style="font-size: 18px; background: #2b2b2b; padding: 10px; border-radius: 5px; border: 1px solid #444;">رصيد المحفظة الحالي: <span id="balance" style="color: #27ae60; font-weight: bold;">0.00</span> دولار</p>
-            <button onclick="handleLogout()" style="background: #c0392b; margin-top: 10px;">تسجيل الخروج</button>
+            <h3 style="color: #e67e22;">مرحباً بك، <span id="user-display" style="color: #fff;"></span></h3>
+            <div class="balance-box">
+                رصيد المحفظة الحالي: <br><span id="balance-display" style="color: #27ae60; font-weight: bold; font-size: 24px;">0.00</span> دولار
+            </div>
+            <p style="font-size: 13px; color: #aaa;">يمكنك تعديل رصيدك وإدارته بكل سهولة.</p>
+            <button class="btn-logout" onclick="logoutWallet()">تسجيل الخروج</button>
         </div>
 
-        <p id="auth-status"></p>
+        <p id="status-msg"></p>
     </div>
 
-    <!-- السكربت البرمجي -->
     <script>
-        const SUPABASE_URL = 'https://xbwikqfkinusoxjujkpw.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_nIPPd4Z2GGdVrD6WCQUPJQ_3oEXbfTA';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        function openWallet() {
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const status = document.getElementById('status-msg');
 
-        async function handleSignUp() {
-            const name = document.getElementById('su-name').value.trim();
-            const email = document.getElementById('su-email').value.trim().toLowerCase();
-            const password = document.getElementById('su-pass').value.trim();
-            const statusEl = document.getElementById('auth-status');
-
-            if (!name || !email || !password) {
-                statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'الرجاء ملء جميع الحقول!';
+            if (!user || !pass) {
+                status.style.color = '#ff6b6b';
+                status.innerText = 'الرجاء ملء جميع الحقول!';
                 return;
             }
 
-            statusEl.style.color = '#f1c40f';
-            statusEl.innerText = 'جاري إنشاء الحساب والدخول...';
+            status.style.color = '#f1c40f';
+            status.innerText = 'جاري فتح المحفظة...';
 
-            // إنشاء الحساب
-            const { data, error } = await _supabase.auth.signUp({
-                email: email,
-                password: password,
-                options: { data: { full_name: name } }
-            });
-
-            if (error) {
-                statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'خطأ: ' + error.message;
-            } else {
-                // تسجيل الدخول تلقائياً بعد الإنشاء مباشرة
-                const { error: loginError } = await _supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
-                if (!loginError) {
-                    statusEl.style.color = '#2ecc71';
-                    statusEl.innerText = 'تم إنشاء الحساب والدخول بنجاح!';
-                    setTimeout(() => {
-                        document.getElementById('auth-forms').style.display = 'none';
-                        document.getElementById('wallet-section').style.display = 'block';
-                        statusEl.innerText = '';
-                    }, 600);
-                } else {
-                    statusEl.style.color = '#2ecc71';
-                    statusEl.innerText = 'تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول من الأسفل.';
-                }
-            }
-        }
-
-        async function handleSignIn() {
-            const email = document.getElementById('si-email').value.trim().toLowerCase();
-            const password = document.getElementById('si-pass').value.trim();
-            const statusEl = document.getElementById('auth-status');
-
-            if (!email || !password) {
-                statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'الرجاء إدخال الإيميل وكلمة السر!';
-                return;
-            }
-
-            statusEl.style.color = '#f1c40f';
-            statusEl.innerText = 'جاري تسجيل الدخول...';
-
-            const { data, error } = await _supabase.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
-
-            if (error) {
-                statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'فشل الدخول: تأكد من صحة البريد وكلمة السر.';
-            } else {
-                statusEl.style.color = '#2ecc71';
-                statusEl.innerText = 'تم الدخول بنجاح!';
-                document.getElementById('auth-forms').style.display = 'none';
+            setTimeout(() => {
+                // إظهار المحفظة وإخفاء نموذج الدخول
+                document.getElementById('auth-box').style.display = 'none';
                 document.getElementById('wallet-section').style.display = 'block';
-                statusEl.innerText = '';
-            }
+                document.getElementById('user-display').innerText = user;
+                document.getElementById('balance-display').innerText = '10.00'; // رصيد تجريبي افتراضي جاهز
+                status.innerText = '';
+            }, 500);
         }
 
-        async function handleLogout() {
-            await _supabase.auth.signOut();
+        function logoutWallet() {
             document.getElementById('wallet-section').style.display = 'none';
-            document.getElementById('auth-forms').style.display = 'block';
-            document.getElementById('auth-status').innerText = 'تم تسجيل الخروج.';
+            document.getElementById('auth-box').style.display = 'block';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('status-msg').innerText = 'تم تسجيل الخروج بنجاح.';
         }
     </script>
 </body>
