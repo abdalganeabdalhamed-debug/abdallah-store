@@ -68,7 +68,169 @@
         }
         .btn-signup { background-color: #27ae60; }
         .btn-signin { background-color: #2980b9; }
-        .btn-otp { background-color: #e67e22; }
         hr {
             border: 0;
             height: 1px;
+            background: #333;
+            margin: 25px 0;
+        }
+        #auth-status {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        #wallet-section {
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="main-container">
+        <h2>متجر عبد الله قرينات</h2>
+
+        <!-- قسم تسجيل الحسابات -->
+        <div id="auth-forms">
+            <!-- نموذج إنشاء حساب جديد -->
+            <div id="signup-box">
+                <h3 style="color: #27ae60; font-size: 18px;">إنشاء حساب ودخول مباشر</h3>
+                <div class="form-group">
+                    <label>الاسم الكامل:</label>
+                    <input type="text" id="su-name" placeholder="أدخل اسمك">
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني:</label>
+                    <input type="email" id="su-email" placeholder="name@example.com">
+                </div>
+                <div class="form-group">
+                    <label>كلمة السر:</label>
+                    <input type="password" id="su-pass" placeholder="6 رموز أو أرقام على الأقل">
+                </div>
+                <button class="btn-signup" onclick="handleSignUp()">تسجيل ودخول للمحفظة</button>
+            </div>
+
+            <hr>
+
+            <!-- نموذج تسجيل الدخول -->
+            <div id="signin-box">
+                <h3 style="color: #2980b9; font-size: 18px;">تسجيل الدخول للمحفظة</h3>
+                <div class="form-group">
+                    <label>البريد الإلكتروني:</label>
+                    <input type="email" id="si-email" placeholder="name@example.com">
+                </div>
+                <div class="form-group">
+                    <label>كلمة السر:</label>
+                    <input type="password" id="si-pass" placeholder="كلمة السر الخاصة بك">
+                </div>
+                <button class="btn-signin" onclick="handleSignIn()">دخول للمحفظة</button>
+            </div>
+        </div>
+
+        <!-- واجهة المحفظة -->
+        <div id="wallet-section">
+            <h3 style="color: #e67e22;">مرحباً بك في محفظتك الآمنة</h3>
+            <p>تم تسجيل دخولك بنجاح إلى متجر عبد الله قرينات.</p>
+            <p style="font-size: 18px; background: #2b2b2b; padding: 10px; border-radius: 5px; border: 1px solid #444;">رصيد المحفظة الحالي: <span id="balance" style="color: #27ae60; font-weight: bold;">0.00</span> دولار</p>
+            <button onclick="handleLogout()" style="background: #c0392b; margin-top: 10px;">تسجيل الخروج</button>
+        </div>
+
+        <p id="auth-status"></p>
+    </div>
+
+    <!-- كود برمجة السكربت والاتصال بقاعدة البيانات -->
+    <script>
+        const SUPABASE_URL = 'https://xbwikqfkinusoxjujkpw.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_nIPPd4Z2GGdVrD6WCQUPJQ_3oEXbfTA';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function handleSignUp() {
+            const name = document.getElementById('su-name').value.trim();
+            const email = document.getElementById('su-email').value.trim().toLowerCase();
+            const password = document.getElementById('su-pass').value.trim();
+            const statusEl = document.getElementById('auth-status');
+
+            if (!name || !email || !password) {
+                statusEl.style.color = '#ff6b6b';
+                statusEl.innerText = 'الرجاء ملء جميع الحقول!';
+                return;
+            }
+
+            if (!email.includes('@') || !email.includes('.')) {
+                statusEl.style.color = '#ff6b6b';
+                statusEl.innerText = 'خطأ: البريد الإلكتروني غير صالح!';
+                return;
+            }
+
+            if (password.length < 6) {
+                statusEl.style.color = '#ff6b6b';
+                statusEl.innerText = 'خطأ: كلمة المرور يجب ألا تقل عن 6 رموز أو أرقام!';
+                return;
+            }
+
+            statusEl.style.color = '#f1c40f';
+            statusEl.innerText = 'جاري إنشاء الحساب والدخول...';
+
+            const { data, error } = await _supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: { data: { full_name: name } }
+            });
+
+            if (error) {
+                statusEl.style.color = '#ff6b6b';
+                statusEl.innerText = 'خطأ في الإنشاء: ' + error.message;
+            } else {
+                statusEl.style.color = '#2ecc71';
+                statusEl.innerText = 'تم إنشاء الحساب ودخول المحفظة بنجاح!';
+                setTimeout(() => {
+                    document.getElementById('auth-forms').style.display = 'none';
+                    document.getElementById('wallet-section').style.display = 'block';
+                    statusEl.innerText = '';
+                }, 800);
+            }
+        }
+
+        async function handleSignIn() {
+            const email = document.getElementById('si-email').value.trim().toLowerCase();
+            const password = document.getElementById('si-pass').value.trim();
+            const statusEl = document.getElementById('auth-status');
+
+            if (!email || !password) {
+                statusEl.style.color = '#ff6b6b';
+                statusEl.innerText = 'الرجاء إدخال الإيميل وكلمة السر!';
+                return;
+            }
+
+            statusEl.style.color = '#f1c40f';
+            statusEl.innerText = 'جاري تسجيل الدخول...';
+
+            const { data, error } = await _supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) {
+                statusEl.style.color = '#ff6b6b';
+                statusEl.innerText = 'فشل الدخول: ' + error.message;
+            } else {
+                statusEl.style.color = '#2ecc71';
+                statusEl.innerText = 'تم تسجيل الدخول بنجاح!';
+                setTimeout(() => {
+                    document.getElementById('auth-forms').style.display = 'none';
+                    document.getElementById('wallet-section').style.display = 'block';
+                    statusEl.innerText = '';
+                }, 800);
+            }
+        }
+
+        async function handleLogout() {
+            await _supabase.auth.signOut();
+            document.getElementById('wallet-section').style.display = 'none';
+            document.getElementById('auth-forms').style.display = 'block';
+            document.getElementById('auth-status').innerText = 'تم تسجيل الخروج بأمان.';
+        }
+    </script>
+</body>
+</html>
