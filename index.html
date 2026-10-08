@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر عبد الله قرينات - لوحة الإدارة والمحفظة</title>
+    <title>متجر عبد الله قرينات - لوحة التحكم والمحفظة</title>
     <style>
         body {
             font-family: Tahoma, sans-serif;
@@ -62,6 +62,7 @@
         button:hover { opacity: 0.9; }
         .btn-main { background-color: #27ae60; width: 100%; padding: 12px; }
         .btn-danger { background-color: #c0392b; }
+        .btn-add { background-color: #2980b9; width: 100%; margin-top: 10px; }
         .btn-logout { background-color: #7f8c8d; width: 100%; margin-top: 20px; }
         
         #dashboard-section {
@@ -102,47 +103,54 @@
     <div class="container">
         <h2>متجر عبد الله قرينات</h2>
 
-        <!-- واجهة تسجيل الدخول -->
+        <!-- واجهة تسجيل الدخول الخام -->
         <div id="auth-box">
             <h3 style="color: #2980b9; font-size: 18px; margin-bottom: 20px;">تسجيل الدخول للمتجر</h3>
             <div class="form-group">
                 <label>اسم المستخدم أو البريد:</label>
-                <input type="text" id="username" placeholder="أدخل اسمك أو بريدك القديم">
+                <input type="text" id="username" placeholder="اكتب أي اسم أو بريد">
             </div>
             <div class="form-group">
                 <label>كلمة السر:</label>
                 <input type="password" id="password" placeholder="كلمة السر">
             </div>
-            <button class="btn-main" onclick="loginSystem()">دخول للمتجر والمحفظة</button>
+            <button class="btn-main" onclick="loginSystem()">دخول للوحة التحكم والمحفظة</button>
         </div>
 
-        <!-- لوحة التحكم الكاملة (المحفظة + المنتجات والروابط للتيك توك وغيرها) -->
+        <!-- لوحة التحكم الكاملة والظاهرة فوراً -->
         <div id="dashboard-section">
             <h3 style="color: #e67e22;">مرحباً بك، <span id="user-display" style="color: #fff;"></span></h3>
             
             <div class="balance-box">
-                رصيد المحفظة: <span id="balance-display" style="color: #27ae60; font-weight: bold;">50.00</span> دولار
+                رصيد المحفظة الحالي: <span id="balance-display" style="color: #27ae60; font-weight: bold;">100.00</span> دولار
             </div>
 
             <hr style="border: 0; height: 1px; background: #333; margin: 20px 0;">
 
             <h3 style="text-align: right; font-size: 16px; color: #3498db;">إدارة المنتجات والروابط (تيك توك وغيرها)</h3>
-            <p style="font-size: 12px; color: #aaa; text-align: right;">يمكنك حذف أي عنصر قديم أو غير مطلوب فوراً:</p>
+            <p style="font-size: 12px; color: #aaa; text-align: right;">يمكنك حذف أي عنصر أو إضافة جديد:</p>
+
+            <!-- نموذج إضافة عنصر جديد -->
+            <div style="background: #252525; padding: 12px; border-radius: 6px; border: 1px solid #444; margin-bottom: 15px;">
+                <input type="text" id="new-item-title" placeholder="اسم الخدمة أو المنتج (مثلاً: شحن تيك توك)" style="margin-bottom: 8px;">
+                <input type="text" id="new-item-link" placeholder="الرابط أو التفاصيل" style="margin-bottom: 8px;">
+                <button class="btn-add" onclick="addNewItem()">إضافة إلى القائمة</button>
+            </div>
 
             <!-- قائمة العناصر والروابط -->
             <div id="items-list">
                 <div class="item-card" id="item-1">
                     <div class="item-info">
-                        <strong>خدمة شحن تيك توك (رابط 1)</strong><br>
-                        <span style="font-size: 12px; color: #888;">https://tiktok.com/@example</span>
+                        <strong>خدمة شحن عملات تيك توك</strong><br>
+                        <span style="font-size: 12px; color: #888;">https://tiktok.com/@abdallh</span>
                     </div>
                     <button class="btn-danger" onclick="deleteItem('item-1')">حذف</button>
                 </div>
 
                 <div class="item-card" id="item-2">
                     <div class="item-info">
-                        <strong>خدمة تفعيل برامج الموبايل</strong><br>
-                        <span style="font-size: 12px; color: #888;">أداة الصيانة السريعة</span>
+                        <strong>أداة صيانة وتفعيل الموبايل</strong><br>
+                        <span style="font-size: 12px; color: #888;">برنامج النظام والخدمات</span>
                     </div>
                     <button class="btn-danger" onclick="deleteItem('item-2')">حذف</button>
                 </div>
@@ -155,6 +163,8 @@
     </div>
 
     <script>
+        let counter = 3;
+
         function loginSystem() {
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value.trim();
@@ -170,12 +180,43 @@
             status.innerText = 'جاري فتح لوحة التحكم...';
 
             setTimeout(() => {
-                // إخفاء نموذج الدخول وإظهار لوحة التحكم والروابط كاملة
                 document.getElementById('auth-box').style.display = 'none';
                 document.getElementById('dashboard-section').style.display = 'block';
                 document.getElementById('user-display').innerText = user;
                 status.innerText = '';
-            }, 400);
+            }, 300);
+        }
+
+        function addNewItem() {
+            const titleInput = document.getElementById('new-item-title');
+            const linkInput = document.getElementById('new-item-link');
+            const title = titleInput.value.trim();
+            const link = linkInput.value.trim();
+
+            if (!title || !link) {
+                alert('الرجاء إدخال اسم المنتج والرابط!');
+                return;
+            }
+
+            counter++;
+            const itemId = 'item-' + counter;
+            
+            const listContainer = document.getElementById('items-list');
+            const newItemDiv = document.createElement('div');
+            newItemDiv.className = 'item-card';
+            newItemDiv.id = itemId;
+            
+            newItemDiv.innerHTML = `
+                <div class="item-info">
+                    <strong>${title}</strong><br>
+                    <span style="font-size: 12px; color: #888;">${link}</span>
+                </div>
+                <button class="btn-danger" onclick="deleteItem('${itemId}')">حذف</button>
+            `;
+            
+            listContainer.appendChild(newItemDiv);
+            titleInput.value = '';
+            linkInput.value = '';
         }
 
         function deleteItem(itemId) {
