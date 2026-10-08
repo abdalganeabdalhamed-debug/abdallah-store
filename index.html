@@ -96,7 +96,7 @@
         <div id="auth-forms">
             <!-- نموذج إنشاء حساب جديد -->
             <div id="signup-box">
-                <h3 style="color: #27ae60; font-size: 18px;">إنشاء حساب جديد والتأكيد برابط الإيميل</h3>
+                <h3 style="color: #27ae60; font-size: 18px;">إنشاء حساب جديد والتأكيد بالرابط</h3>
                 <div class="form-group">
                     <label>الاسم الكامل:</label>
                     <input type="text" id="su-name" placeholder="أدخل اسمك">
@@ -117,7 +117,7 @@
             <!-- نموذج تسجيل الدخول -->
             <div id="signin-box">
                 <h3 style="color: #2980b9; font-size: 18px;">تسجيل الدخول للمحفظة</h3>
-                <p style="font-size: 12px; color: #aaa;">بعد تأكيد إيميلك بالرابط، أدخل بياناتك هنا للدخول:</p>
+                <p style="font-size: 12px; color: #aaa;">بعد الضغط على رابط الإيميل، سجل دخولك هنا:</p>
                 <div class="form-group">
                     <label>البريد الإلكتروني:</label>
                     <input type="email" id="si-email" placeholder="name@example.com">
@@ -130,10 +130,10 @@
             </div>
         </div>
 
-        <!-- واجهة المحفظة -->
+        <!-- واجهة المحفظة (لا تظهر أبدًا إلا بعد تسجيل الدخول الصحيح) -->
         <div id="wallet-section">
             <h3 style="color: #e67e22;">مرحباً بك في محفظتك الآمنة</h3>
-            <p>تم توثيق حسابك وتسجيل دخولك بنجاح إلى متجر عبد الله قرينات.</p>
+            <p>تم توثيق حسابك وتأكيد بريدك الإلكتروني بنجاح.</p>
             <p style="font-size: 18px; background: #2b2b2b; padding: 10px; border-radius: 5px; border: 1px solid #444;">رصيد المحفظة الحالي: <span id="balance" style="color: #27ae60; font-weight: bold;">0.00</span> دولار</p>
             <button onclick="handleLogout()" style="background: #c0392b; margin-top: 10px;">تسجيل الخروج</button>
         </div>
@@ -146,15 +146,6 @@
         const SUPABASE_URL = 'https://xbwikqfkinusoxjujkpw.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_nIPPd4Z2GGdVrD6WCQUPJQ_3oEXbfTA';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // التحقق التلقائي لو المستخدم فتح الرابط من الإيميل ورجع للمتجر
-        window.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await _supabase.auth.getSession();
-            if (session) {
-                document.getElementById('auth-forms').style.display = 'none';
-                document.getElementById('wallet-section').style.display = 'block';
-            }
-        });
 
         async function handleSignUp() {
             const name = document.getElementById('su-name').value.trim();
@@ -176,7 +167,7 @@
                 password: password,
                 options: { 
                     data: { full_name: name },
-                    emailRedirectTo: window.location.href // يرجع لنفس الصفحة بعد الضغط على الرابط
+                    emailRedirectTo: window.location.href 
                 }
             });
 
@@ -185,7 +176,11 @@
                 statusEl.innerText = 'خطأ في الإنشاء: ' + error.message;
             } else {
                 statusEl.style.color = '#2ecc71';
-                statusEl.innerText = 'تم إنشاء الحساب بنجاح! ✉️ تم إرسال رابط التأكيد إلى بريدك الإلكتروني. افتح إيميلك واضغط على الرابط لتفعيل الحساب والدخول.';
+                statusEl.innerText = 'تم إنشاء الحساب بنجاح! ✉️ تم إرسال رابط التأكيد إلى بريدك الإلكتروني. يرجى الذهاب إلى إيميلك والضغط على الرابط لتفعيل الحساب، ثم العودة لتسجيل الدخول.';
+                // مسح حقول التسجيل لكي يذهب لتسجيل الدخول لاحقاً
+                document.getElementById('su-name').value = '';
+                document.getElementById('su-email').value = '';
+                document.getElementById('su-pass').value = '';
             }
         }
 
@@ -201,7 +196,7 @@
             }
 
             statusEl.style.color = '#f1c40f';
-            statusEl.innerText = 'جاري تسجيل الدخول...';
+            statusEl.innerText = 'جاري التحقق وتسجيل الدخول...';
 
             const { data, error } = await _supabase.auth.signInWithPassword({
                 email: email,
@@ -210,7 +205,7 @@
 
             if (error) {
                 statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'فشل الدخول: تأكد من تأكيد إيميلك عبر الرابط أولاً، أو صحة بياناتك.';
+                statusEl.innerText = 'فشل الدخول: تأكد من أنك ضغطت على رابط التأكيد في إيميلك أولاً، أو صحة بياناتك.';
             } else {
                 statusEl.style.color = '#2ecc71';
                 statusEl.innerText = 'تم تسجيل الدخول بنجاح!';
