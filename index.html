@@ -79,6 +79,7 @@
             margin-top: 15px;
             font-weight: bold;
             font-size: 14px;
+            line-height: 1.6;
         }
         #wallet-section {
             display: none;
@@ -95,7 +96,7 @@
         <div id="auth-forms">
             <!-- نموذج إنشاء حساب جديد -->
             <div id="signup-box">
-                <h3 style="color: #27ae60; font-size: 18px;">إنشاء حساب ودخول مباشر</h3>
+                <h3 style="color: #27ae60; font-size: 18px;">إنشاء حساب جديد والتأكيد برابط الإيميل</h3>
                 <div class="form-group">
                     <label>الاسم الكامل:</label>
                     <input type="text" id="su-name" placeholder="أدخل اسمك">
@@ -108,7 +109,7 @@
                     <label>كلمة السر:</label>
                     <input type="password" id="su-pass" placeholder="6 رموز أو أرقام على الأقل">
                 </div>
-                <button class="btn-signup" onclick="handleSignUp()">تسجيل ودخول للمحفظة</button>
+                <button class="btn-signup" onclick="handleSignUp()">تسجيل وإرسال رابط التأكيد للإيميل</button>
             </div>
 
             <hr>
@@ -116,6 +117,7 @@
             <!-- نموذج تسجيل الدخول -->
             <div id="signin-box">
                 <h3 style="color: #2980b9; font-size: 18px;">تسجيل الدخول للمحفظة</h3>
+                <p style="font-size: 12px; color: #aaa;">بعد تأكيد إيميلك بالرابط، أدخل بياناتك هنا للدخول:</p>
                 <div class="form-group">
                     <label>البريد الإلكتروني:</label>
                     <input type="email" id="si-email" placeholder="name@example.com">
@@ -131,7 +133,7 @@
         <!-- واجهة المحفظة -->
         <div id="wallet-section">
             <h3 style="color: #e67e22;">مرحباً بك في محفظتك الآمنة</h3>
-            <p>تم تسجيل دخولك بنجاح إلى متجر عبد الله قرينات.</p>
+            <p>تم توثيق حسابك وتسجيل دخولك بنجاح إلى متجر عبد الله قرينات.</p>
             <p style="font-size: 18px; background: #2b2b2b; padding: 10px; border-radius: 5px; border: 1px solid #444;">رصيد المحفظة الحالي: <span id="balance" style="color: #27ae60; font-weight: bold;">0.00</span> دولار</p>
             <button onclick="handleLogout()" style="background: #c0392b; margin-top: 10px;">تسجيل الخروج</button>
         </div>
@@ -145,6 +147,15 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_nIPPd4Z2GGdVrD6WCQUPJQ_3oEXbfTA';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // التحقق التلقائي لو المستخدم فتح الرابط من الإيميل ورجع للمتجر
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) {
+                document.getElementById('auth-forms').style.display = 'none';
+                document.getElementById('wallet-section').style.display = 'block';
+            }
+        });
+
         async function handleSignUp() {
             const name = document.getElementById('su-name').value.trim();
             const email = document.getElementById('su-email').value.trim().toLowerCase();
@@ -157,25 +168,16 @@
                 return;
             }
 
-            if (!email.includes('@') || !email.includes('.')) {
-                statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'خطأ: البريد الإلكتروني غير صالح!';
-                return;
-            }
-
-            if (password.length < 6) {
-                statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'خطأ: كلمة المرور يجب ألا تقل عن 6 رموز أو أرقام!';
-                return;
-            }
-
             statusEl.style.color = '#f1c40f';
-            statusEl.innerText = 'جاري إنشاء الحساب والدخول...';
+            statusEl.innerText = 'جاري إنشاء الحساب وإرسال رابط التأكيد...';
 
             const { data, error } = await _supabase.auth.signUp({
                 email: email,
                 password: password,
-                options: { data: { full_name: name } }
+                options: { 
+                    data: { full_name: name },
+                    emailRedirectTo: window.location.href // يرجع لنفس الصفحة بعد الضغط على الرابط
+                }
             });
 
             if (error) {
@@ -183,12 +185,7 @@
                 statusEl.innerText = 'خطأ في الإنشاء: ' + error.message;
             } else {
                 statusEl.style.color = '#2ecc71';
-                statusEl.innerText = 'تم إنشاء الحساب ودخول المحفظة بنجاح!';
-                setTimeout(() => {
-                    document.getElementById('auth-forms').style.display = 'none';
-                    document.getElementById('wallet-section').style.display = 'block';
-                    statusEl.innerText = '';
-                }, 800);
+                statusEl.innerText = 'تم إنشاء الحساب بنجاح! ✉️ تم إرسال رابط التأكيد إلى بريدك الإلكتروني. افتح إيميلك واضغط على الرابط لتفعيل الحساب والدخول.';
             }
         }
 
@@ -213,7 +210,7 @@
 
             if (error) {
                 statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'فشل الدخول: ' + error.message;
+                statusEl.innerText = 'فشل الدخول: تأكد من تأكيد إيميلك عبر الرابط أولاً، أو صحة بياناتك.';
             } else {
                 statusEl.style.color = '#2ecc71';
                 statusEl.innerText = 'تم تسجيل الدخول بنجاح!';
