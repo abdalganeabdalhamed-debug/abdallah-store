@@ -117,6 +117,7 @@
             border-radius: 10px;
             margin-bottom: 25px;
             font-weight: bold;
+            text-align: right;
         }
 
         .wallet-title {
@@ -137,6 +138,7 @@
             border-radius: 5px;
             font-size: 13px;
             cursor: pointer;
+            margin-top: 8px;
         }
 
         .store-grid {
@@ -254,6 +256,22 @@
             cursor: pointer;
         }
 
+        /* صفحة إضافة الرصيد (بنكك / ميركاش) */
+        #deposit-page {
+            display: none;
+            text-align: right;
+        }
+
+        .bank-info-box {
+            background-color: #2b2b2b;
+            border: 1px dashed #38ef7d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
         .social-btns {
             margin-top: 25px;
             display: flex;
@@ -269,6 +287,7 @@
             text-decoration: none;
             font-weight: bold;
             font-size: 14px;
+            text-align: center;
         }
 
         .btn-wa { background-color: #25D366; }
@@ -278,6 +297,7 @@
             margin-top: 15px;
             font-size: 16px;
             font-weight: bold;
+            text-align: center;
         }
     </style>
 </head>
@@ -328,7 +348,7 @@
             <div class="wallet-card">
                 <div class="wallet-title">مرحباً: <span id="user-name-display"></span></div>
                 <div class="wallet-balance">$<span id="balance">0.00</span></div>
-                <button class="btn-deposit" onclick="addMoney()">+ إيداع رصيد</button>
+                <button class="btn-deposit" onclick="showDepositPage()">+ إضافة رصيد</button>
                 <button class="btn-deposit" onclick="logout()" style="background-color: #dc3545; margin-right: 5px;">تسجيل خروج</button>
             </div>
 
@@ -388,7 +408,7 @@
 
             </div>
 
-            <p style="margin-top: 20px; font-size: 13px; color: #aaa;">شكراً عملائنا الكرام نحن دوماً في خدماتكم للتواصل:</p>
+            <p style="margin-top: 20px; font-size: 13px; color: #aaa; text-align: center;">شكراً عملائنا الكرام نحن دوماً في خدماتكم للتواصل:</p>
 
             <div class="social-btns">
                 <a href="https://wa.me/" target="_blank" class="btn-social btn-wa">واتساب (WhatsApp)</a>
@@ -396,6 +416,23 @@
             </div>
 
             <div class="footer">والسلام</div>
+        </div>
+
+        <!-- 4. واجهة صفحة إضافة الرصيد (تحويل بنكك / ميركاش) -->
+        <div id="deposit-page">
+            <h3 style="color: #38ef7d; margin-bottom: 15px; text-align: center;">إضافة رصيد للحساب</h3>
+            
+            <div class="bank-info-box">
+                <p style="font-weight: bold; margin-bottom: 8px; color: #38ef7d;">معلومات التحويل المباشر:</p>
+                قم بالتحويل عبر التطبيق أدناه، ثم أرسل إيصال التحويل عبر الواتساب:
+                <br><br>
+                📱 **تطبيق بنكك (Bankak):** <code>123456789</code><br>
+                💳 **ميركاش (MerCash):** <code>987654321</code><br>
+                👤 **اسم المستفيد:** عبد الله قرينان
+            </div>
+
+            <button class="btn" style="background-color: #25D366; margin-bottom: 10px;" onclick="openWhatsApp()">إرسال الإيصال عبر الواتساب</button>
+            <button class="btn btn-secondary" onclick="backToStore()">العودة للمتجر</button>
         </div>
 
     </div>
@@ -415,7 +452,7 @@
         </div>
     </div>
 
-    <!-- كود الجافا سكريبت متصل مع Supabase -->
+    <!-- كود الجافا سكريبت الأصلي للربط -->
     <script>
         const SUPABASE_URL = 'https://jsptynjktxfetyxebwvo.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_xCxX3NCHHcnTWywv9eudZg_mAfImIYD';
@@ -436,7 +473,21 @@
             document.getElementById('reg-error').style.display = 'none';
         }
 
-        // 1. تسجيل حساب جديد وحفظه في Supabase
+        function showDepositPage() {
+            document.getElementById('store-page').style.display = 'none';
+            document.getElementById('deposit-page').style.display = 'block';
+        }
+
+        function backToStore() {
+            document.getElementById('deposit-page').style.display = 'none';
+            document.getElementById('store-page').style.display = 'block';
+        }
+
+        function openWhatsApp() {
+            window.open('https://wa.me/249XXXXXXXXX?text=مرحباً عبد الله، لقد قمت بالتحويل لإضافة رصيد وهذا هو الإيصال.', '_blank');
+        }
+
+        // 1. تسجيل حساب جديد (الرصيد الابتدائي 0.00)
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -448,7 +499,7 @@
             if (name && email && password) {
                 const { error } = await supabaseClient
                     .from('store_users')
-                    .insert([{ name: name, email: email, password: password, balance: 100.00 }]); // يمنحه رصيد ابتدائي 100$
+                    .insert([{ name: name, email: email, password: password, balance: 0.00 }]);
 
                 if (error) {
                     regError.style.display = 'block';
@@ -464,7 +515,7 @@
             }
         });
 
-        // 2. تسجيل الدخول والتحقق من Supabase
+        // 2. تسجيل الدخول
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -486,6 +537,7 @@
                 loginError.style.display = 'none';
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('store-page').style.display = 'block';
+                document.getElementById('deposit-page').style.display = 'none';
                 document.getElementById('user-name-display').textContent = currentUser.name;
                 document.getElementById('balance').textContent = Number(currentUser.balance).toFixed(2);
             }
@@ -494,11 +546,11 @@
         function logout() {
             currentUser = null;
             document.getElementById('store-page').style.display = 'none';
+            document.getElementById('deposit-page').style.display = 'none';
             document.getElementById('login-page').style.display = 'block';
             document.getElementById('loginForm').reset();
         }
 
-        // تحديث الرصيد في قاعدة البيانات عند الشراء أو الإيداع
         async function updateBalanceInDB(newBalance) {
             const { error } = await supabaseClient
                 .from('store_users')
@@ -515,17 +567,6 @@
             return true;
         }
 
-        async function addMoney() {
-            let amount = prompt("ادخل المبلغ المراد إضافته للمحفظة ($):", "1000");
-            if (amount && !isNaN(amount) && amount > 0) {
-                let newBal = Number(currentUser.balance) + parseFloat(amount);
-                let success = await updateBalanceInDB(newBal);
-                if (success) {
-                    alert("تم إضافة $" + amount + " إلى محفظتك بنجاح!");
-                }
-            }
-        }
-
         async function chargeByPlayerID(itemName, price) {
             if (Number(currentUser.balance) >= price) {
                 let id = prompt("ادخل الـ ID الخاص بك في " + itemName + ":");
@@ -537,7 +578,7 @@
                     }
                 }
             } else {
-                alert("عذراً! رصيدك غير كافٍ لشحن " + itemName + ". قم بإيداع رصيد أولاً.");
+                alert("عذراً! رصيدك غير كافٍ لشحن " + itemName + ". قم بإضافة رصيد أولاً.");
             }
         }
 
@@ -545,7 +586,7 @@
             if (Number(currentUser.balance) >= 50) {
                 document.getElementById('tiktok-modal').style.display = 'flex';
             } else {
-                alert("عذراً! رصيدك غير كافٍ لشحن تيك توك ($50). قم بإيداع رصيد أولاً.");
+                alert("عذراً! رصيدك غير كافٍ لشحن تيك توك ($50). قم بإضافة رصيد أولاً.");
             }
         }
 
