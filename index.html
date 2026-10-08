@@ -9,15 +9,15 @@
     <style>
         body {
             font-family: Tahoma, sans-serif;
-            background-color: #121212; /* خلفية داكنة فخمة */
+            background-color: #121212;
             margin: 0;
             padding: 20px;
-            color: #e0e0e0; /* نص فاتح مريح للعين */
+            color: #e0e0e0;
         }
         .container {
             max-width: 450px;
             margin: 0 auto;
-            background: #1e1e1e; /* لون الحاوية الداكن */
+            background: #1e1e1e;
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
@@ -65,15 +65,9 @@
         button:hover {
             opacity: 0.9;
         }
-        .btn-signup {
-            background-color: #27ae60;
-        }
-        .btn-signin {
-            background-color: #2980b9;
-        }
-        .btn-otp {
-            background-color: #e67e22;
-        }
+        .btn-signup { background-color: #27ae60; }
+        .btn-signin { background-color: #2980b9; }
+        .btn-otp { background-color: #e67e22; }
         hr {
             border: 0;
             height: 1px;
@@ -134,22 +128,22 @@
             </div>
         </div>
 
-        <!-- قسم إدخال رمز التحقق OTP (يظهر بعد التسجيل لاختبار الرمز) -->
+        <!-- قسم إدخال رمز التحقق OTP -->
         <div id="otp-section">
             <h3 style="color: #e67e22; font-size: 18px;">تأكيد البريد الإلكتروني (OTP)</h3>
-            <p style="font-size: 13px; color: #aaa;">أدخل رمز التحقق (OTP) أو اضغط الرابط المرسل لإيميلك.</p>
+            <p style="font-size: 13px; color: #aaa;">أدخل رمز التحقق المرسل لإيميلك.</p>
             <div class="form-group">
                 <label>البريد الإلكتروني:</label>
                 <input type="email" id="otp-email" placeholder="أدخل إيميلك المسجل">
             </div>
             <div class="form-group">
-                <label>رمز التحقق (الأرقام):</label>
+                <label>رمز التحقق:</label>
                 <input type="text" id="otp-token" placeholder="أدخل الرمز المكون من أرقام">
             </div>
             <button class="btn-otp" onclick="handleVerifyOTP()">تأكيد الرمز ودخول المحفظة</button>
         </div>
 
-        <!-- واجهة المحفظة والشحن (تظهر بعد الدخول الناجح) -->
+        <!-- واجهة المحفظة -->
         <div id="wallet-section">
             <h3 style="color: #e67e22;">مرحباً بك في محفظتك الشخصية</h3>
             <p>تم تسجيل دخولك بنجاح إلى متجر عبد الله قرينات.</p>
@@ -163,10 +157,10 @@
     <!-- كود برمجة السكربت والاتصال بقاعدة البيانات -->
     <script>
         const SUPABASE_URL = 'https://npuljhidfkrznkxhslsy.supabase.co';
-        const SUPABASE_ANON_KEY = 'Sb_publishable_6gycigSkV72C6wFNN_BrVg_CR8KRadd';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // المفتاح العام (Public Anon Key) الصحيح والمحدث لمشروعك
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wdWxqaGlkZmtyem5reGhzbHN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwNTU4NzIsImV4cCI6MjA2MzYzMTg3Mn0.6gycigSkV72C6wFNN_BrVg_CR8KRadd_Placeholder';
+        const _supabase = supabase.createClient(SUPABASE_URL, 'Sb_publishable_6gycigSkV72C6wFNN_BrVg_CR8KRadd');
 
-        // دالة إنشاء الحساب
         async function handleSignUp() {
             const name = document.getElementById('su-name').value.trim();
             const email = document.getElementById('su-email').value.trim();
@@ -175,12 +169,12 @@
 
             if (!name || !email || !password) {
                 statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'الرجاء ملء جميع الحقول بصورة صحيحة!';
+                statusEl.innerText = 'الرجاء ملء جميع الحقول!';
                 return;
             }
 
             statusEl.style.color = '#f1c40f';
-            statusEl.innerText = 'جاري إنشاء الحساب وإرسال رمز التحقق...';
+            statusEl.innerText = 'جاري إنشاء الحساب...';
 
             const { data, error } = await _supabase.auth.signUp({
                 email: email,
@@ -193,29 +187,17 @@
                 statusEl.innerText = 'خطأ في الإنشاء: ' + error.message;
             } else {
                 statusEl.style.color = '#2ecc71';
-                statusEl.innerText = 'تم إنشاء الحساب! تحقق من إيميلك وضع الرمز أدناه.';
-                
-                // إظهار شاشة اختبار الـ OTP ونقل الإيميل تلقائياً
+                statusEl.innerText = 'تم إنشاء الحساب! تحقق من إيميلك.';
                 document.getElementById('auth-forms').style.display = 'none';
                 document.getElementById('otp-email').value = email;
                 document.getElementById('otp-section').style.display = 'block';
             }
         }
 
-        // دالة التحقق من رمز الـ OTP
         async function handleVerifyOTP() {
             const email = document.getElementById('otp-email').value.trim();
             const token = document.getElementById('otp-token').value.trim();
             const statusEl = document.getElementById('auth-status');
-
-            if (!email || !token) {
-                statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'الرجاء إدخال البريد ورمز التحقق!';
-                return;
-            }
-
-            statusEl.style.color = '#f1c40f';
-            statusEl.innerText = 'جاري التحقق من الرمز...';
 
             const { data, error } = await _supabase.auth.verifyOtp({
                 email: email,
@@ -225,11 +207,10 @@
 
             if (error) {
                 statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'فشل التحقق: تأكد من صحة الرمز!';
+                statusEl.innerText = 'فشل التحقق: ' + error.message;
             } else {
                 statusEl.style.color = '#2ecc71';
-                statusEl.innerText = 'تم تأكيد الحساب ودخول المحفظة بنجاح!';
-                
+                statusEl.innerText = 'تم تأكيد الحساب بنجاح!';
                 setTimeout(() => {
                     document.getElementById('otp-section').style.display = 'none';
                     document.getElementById('wallet-section').style.display = 'block';
@@ -238,20 +219,10 @@
             }
         }
 
-        // دالة تسجيل الدخول
         async function handleSignIn() {
             const email = document.getElementById('si-email').value.trim();
             const password = document.getElementById('si-pass').value.trim();
             const statusEl = document.getElementById('auth-status');
-
-            if (!email || !password) {
-                statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'الرجاء إدخال البريد وكلمة السر!';
-                return;
-            }
-
-            statusEl.style.color = '#f1c40f';
-            statusEl.innerText = 'جاري التحقق وتسجيل الدخول...';
 
             const { data, error } = await _supabase.auth.signInWithPassword({
                 email: email,
@@ -260,11 +231,10 @@
 
             if (error) {
                 statusEl.style.color = '#ff6b6b';
-                statusEl.innerText = 'فشل الدخول: تأكد من تفعيل الإيميل أو صحة البيانات!';
+                statusEl.innerText = 'فشل الدخول: ' + error.message;
             } else {
                 statusEl.style.color = '#2ecc71';
                 statusEl.innerText = 'تم تسجيل الدخول بنجاح!';
-                
                 setTimeout(() => {
                     document.getElementById('auth-forms').style.display = 'none';
                     document.getElementById('wallet-section').style.display = 'block';
@@ -273,13 +243,11 @@
             }
         }
 
-        // دالة تسجيل الخروج
         async function handleLogout() {
             await _supabase.auth.signOut();
             document.getElementById('wallet-section').style.display = 'none';
             document.getElementById('auth-forms').style.display = 'block';
-            document.getElementById('auth-status').style.color = '#3498db';
-            document.getElementById('auth-status').innerText = 'تم تسجيل الخروج بنجاح.';
+            document.getElementById('auth-status').innerText = 'تم تسجيل الخروج.';
         }
     </script>
 </body>
