@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>عبد الله قرينان - متجر الشحن</title>
-    <!-- مكتبة Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
@@ -44,253 +43,514 @@
             color: #38ef7d;
         }
 
-        input, button {
-            padding: 12px;
-            margin: 8px 0;
-            font-size: 15px;
-            width: 100%;
-            box-sizing: border-box;
-            border-radius: 6px;
-            outline: none;
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 15px;
         }
 
         input {
+            width: 100%;
+            padding: 12px;
             background-color: #2b2b2b;
             border: 1px solid #444;
+            border-radius: 6px;
             color: #fff;
+            font-size: 15px;
+            outline: none;
         }
 
         input:focus {
             border-color: #38ef7d;
         }
 
-        button {
+        .btn {
+            width: 100%;
+            padding: 12px;
             background: linear-gradient(135deg, #11998e, #38ef7d);
-            color: white;
             border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
         }
 
-        button:hover {
-            opacity: 0.9;
-        }
-
-        .secondary-btn {
+        .btn-secondary {
             background: transparent;
             border: 1px solid #38ef7d;
             color: #38ef7d;
             margin-top: 10px;
         }
 
-        .secondary-btn:hover {
+        .btn-secondary:hover {
             background-color: rgba(56, 239, 125, 0.1);
         }
 
-        .hidden { display: none; }
-
-        .product-card {
-            border: 1px solid #3d3d3d;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            background: #2a2a2a;
-            text-align: right;
+        .error-msg {
+            color: #ff4d4d;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: none;
         }
 
-        .wallet-box {
+        .success-msg {
+            color: #38ef7d;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        #store-page {
+            display: none;
+        }
+
+        .wallet-card {
             background: linear-gradient(135deg, #1f4037, #99f2c8);
             color: #111;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 25px;
             font-weight: bold;
+        }
+
+        .wallet-title {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .wallet-balance {
+            font-size: 28px;
+            margin: 8px 0;
+        }
+
+        .btn-deposit {
+            background-color: #111;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .store-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .store-item {
+            background-color: #2a2a2a;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            background-color: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .tiktok-svg {
+            width: 26px;
+            height: 26px;
+            fill: #ffffff;
+        }
+
+        .item-details {
             text-align: right;
         }
 
-        .link-text {
-            color: #38ef7d;
+        .item-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .item-price {
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .btn-charge {
+            background-color: #38ef7d;
+            color: #111;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
             cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            width: 90%;
+            max-width: 400px;
             text-align: center;
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
             margin-top: 15px;
+        }
+
+        .btn-cancel {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            width: 50%;
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            background-color: #38ef7d;
+            color: #111;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            width: 50%;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .social-btns {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-social {
             display: block;
+            padding: 10px;
+            border-radius: 6px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
             font-size: 14px;
         }
-        .link-text:hover { text-decoration: underline; }
+
+        .btn-wa { background-color: #25D366; }
+        .btn-fb { background-color: #1877F2; }
+
+        .footer {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>عبد الله قرينان</h1>
+    <div class="container">
+        <h1>عبد الله قرينان</h1>
 
-    <!-- قسم تسجيل الدخول -->
-    <div id="login-section">
-        <h2>تسجيل الدخول</h2>
-        <input type="email" id="login-email" placeholder="البريد الإلكتروني">
-        <input type="password" id="login-password" placeholder="كلمة المرور">
-        <button onclick="loginUser()">تسجيل الدخول</button>
-        <p id="login-msg" style="color: #ff4d4d; font-size: 14px;"></p>
-        <span class="link-text" onclick="showSignup()">ليس لديك حساب؟ اضغط هنا لإنشاء حساب جديد</span>
-    </div>
+        <div id="login-page">
+            <p style="margin-bottom: 15px; color: #bbb;">قم بتسجيل الدخول للوصول للمتجر والمحفظة</p>
+            
+            <div id="login-error" class="error-msg">البريد أو كلمة السر غير صحيحة!</div>
+            <div id="register-success" class="success-msg">تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.</div>
 
-    <!-- قسم إنشاء حساب جديد -->
-    <div id="signup-section" class="hidden">
-        <h2>إنشاء حساب جديد</h2>
-        <input type="text" id="signup-name" placeholder="الاسم الكامل">
-        <input type="email" id="signup-email" placeholder="البريد الإلكتروني">
-        <input type="password" id="signup-password" placeholder="كلمة المرور">
-        <button onclick="signupUser()" style="background: #007bff;">تأكيد إنشاء الحساب</button>
-        <p id="signup-msg" style="color: #ff4d4d; font-size: 14px;"></p>
-        <button class="secondary-btn" onclick="showLogin()">العودة لتسجيل الدخول</button>
-    </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="email" id="login-email" placeholder="ادخل البريد الالكتروني" required>
+                    <input type="password" id="login-password" placeholder="ادخل كلمة السر" required>
+                    <button type="submit" class="btn">تسجيل الدخول</button>
+                </div>
+            </form>
 
-    <!-- قسم المتجر والمنتجات (يظهر بعد تسجيل الدخول الناجح) -->
-    <div id="store-section" class="hidden">
-        <div class="wallet-box">
-            مرحباً، <span id="user-name-display"></span><br>
-            البريد: <span id="user-email-display"></span><br>
-            رصيد المحفظة: $<span id="user-balance">0.00</span>
-            <button onclick="logout()" style="background-color: #dc3545; width: auto; padding: 6px 12px; margin-top: 10px;">تسجيل خروج</button>
+            <button class="btn btn-secondary" onclick="showRegisterPage()">إنشاء حساب جديد (Create Account)</button>
         </div>
 
-        <hr style="border: 0; border-top: 1px solid #444; margin: 15px 0;">
+        <div id="register-page" style="display: none;">
+            <p style="margin-bottom: 15px; color: #bbb;">أدخل بياناتك لإنشاء حساب جديد</p>
+            
+            <div id="reg-error" class="error-msg">يرجى ملء كافة الحقول بشكل صحيح أو البريد مستخدم مسبقاً!</div>
 
-        <h2>قائمة المنتجات</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <input type="text" id="reg-name" placeholder="الاسم الكامل" required>
+                    <input type="email" id="reg-email" placeholder="ادخل البريد الالكتروني" required>
+                    <input type="password" id="reg-password" placeholder="ادخل كلمة السر" required>
+                    <button type="submit" class="btn">إنشاء الحساب</button>
+                </div>
+            </form>
 
-        <div id="products-list">
-            <div class="product-card">
-                <h3>فري فاير (Free Fire)</h3>
-                <p style="color: #aaa; font-size: 13px;">شحن 2000 جوهرة</p>
-                <p style="font-weight: bold; color: #38ef7d; margin: 5px 0;">السعر: $100.00</p>
-                <button onclick="buyItem(100)">شراء المنتج</button>
+            <button class="btn btn-secondary" onclick="showLoginPage()">الرجوع لتسجيل الدخول</button>
+        </div>
+
+        <div id="store-page">
+            
+            <div class="wallet-card">
+                <div class="wallet-title">مرحباً: <span id="user-name-display"></span></div>
+                <div class="wallet-balance">$<span id="balance">0.00</span></div>
+                <button class="btn-deposit" onclick="addMoney()">+ إيداع رصيد</button>
+                <button class="btn-deposit" onclick="logout()" style="background-color: #dc3545; margin-right: 5px;">تسجيل خروج</button>
             </div>
-            <div class="product-card">
-                <h3>تيك توك (TikTok)</h3>
-                <p style="color: #aaa; font-size: 13px;">شحن 1000 عملة</p>
-                <p style="font-weight: bold; color: #38ef7d; margin: 5px 0;">السعر: $50.00</p>
-                <button onclick="buyItem(50)">شراء المنتج</button>
+
+            <div class="store-grid">
+                <div class="store-item">
+                    <div class="item-info">
+                        <div class="item-icon" style="color: #ff9f43;">🔥</div>
+                        <div class="item-details">
+                            <div class="item-title">فري فاير (Free Fire)</div>
+                            <div class="item-price">شحن 2000 جوهرة - $100</div>
+                        </div>
+                    </div>
+                    <button class="btn-charge" onclick="chargeByPlayerID('فري فاير', 100)">شحن</button>
+                </div>
+
+                <div class="store-item">
+                    <div class="item-info">
+                        <div class="item-icon">
+                            <svg class="tiktok-svg" viewBox="0 0 448 512">
+                                <path d="M448 209.91a210.06 210.06 0 0 1-122.77-39.25V349.38A162.55 162.55 0 1 1 185 188.31V258.2a90.08 90.08 0 1 0 52.83 82.52V0h68.32a141.52 141.52 0 0 0 88.35 113.88 141.17 141.17 0 0 0 53.5 10.23z"/>
+                            </svg>
+                        </div>
+                        <div class="item-details">
+                            <div class="item-title">تيك توك (TikTok)</div>
+                            <div class="item-price">شحن 1000 عملة - $50</div>
+                        </div>
+                    </div>
+                    <button class="btn-charge" onclick="openTikTokModal()">شحن</button>
+                </div>
+
+                <div class="store-item">
+                    <div class="item-info">
+                        <div class="item-icon" style="color: #00a8ff;">💎</div>
+                        <div class="item-details">
+                            <div class="item-title">إيمو (IMO)</div>
+                            <div class="item-price">شحن 3000 ماسة - $150</div>
+                        </div>
+                    </div>
+                    <button class="btn-charge" onclick="chargeByPlayerID('إيمو', 150)">شحن</button>
+                </div>
+
+                <div class="store-item">
+                    <div class="item-info">
+                        <div class="item-icon" style="color: #f1c40f;">🎮</div>
+                        <div class="item-details">
+                            <div class="item-title">ببجي (PUBG Mobile)</div>
+                            <div class="item-price">شحن 2000 شدة - $120</div>
+                        </div>
+                    </div>
+                    <button class="btn-charge" onclick="chargeByPlayerID('ببجي شدات', 120)">شحن</button>
+                </div>
             </div>
-            <div class="product-card">
-                <h3>ببجي (PUBG Mobile)</h3>
-                <p style="color: #aaa; font-size: 13px;">شحن 2000 شدة</p>
-                <p style="font-weight: bold; color: #38ef7d; margin: 5px 0;">السعر: $120.00</p>
-                <button onclick="buyItem(120)">شراء المنتج</button>
+
+            <p style="margin-top: 20px; font-size: 13px; color: #aaa;">شكراً عملائنا الكرام نحن دوماً في خدماتكم للتواصل:</p>
+
+            <div class="social-btns">
+                <a href="https://wa.me/" target="_blank" class="btn-social btn-wa">واتساب (WhatsApp)</a>
+                <a href="https://facebook.com/" target="_blank" class="btn-social btn-fb">فيسبوك (Facebook)</a>
+            </div>
+
+            <div class="footer">والسلام</div>
+        </div>
+    </div>
+
+    <div id="tiktok-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: #38ef7d; margin-bottom: 15px;">شحن حساب تيك توك</h3>
+            <div class="form-group">
+                <input type="text" id="tt-username" placeholder="ادخل اليوزر نيم (Username)">
+                <input type="password" id="tt-password" placeholder="ادخل كلمة السر (Password)">
+            </div>
+            <div class="modal-btns">
+                <button class="btn-confirm" onclick="confirmTikTokCharge()">تأكيد الشحن ($50)</button>
+                <button class="btn-cancel" onclick="closeTikTokModal()">إلغاء</button>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    const SUPABASE_URL = 'https://jsptynjktxfetyxebwvo.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_xCxX3NCHHcnTWywv9eudZg_mAfImIYD';
-    
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let currentUser = null;
+    <script>
+        const SUPABASE_URL = 'https://jsptynjktxfetyxebwvo.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_xCxX3NCHHcnTWywv9eudZg_mAfImIYD';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentUser = null;
 
-    function showSignup() {
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('signup-section').classList.remove('hidden');
-        document.getElementById('login-msg').innerText = '';
-    }
-
-    function showLogin() {
-        document.getElementById('signup-section').classList.add('hidden');
-        document.getElementById('login-section').classList.remove('hidden');
-        document.getElementById('signup-msg').innerText = '';
-    }
-
-    async function signupUser() {
-        const name = document.getElementById('signup-name').value.trim();
-        const email = document.getElementById('signup-email').value.trim();
-        const password = document.getElementById('signup-password').value.trim();
-        const msgEl = document.getElementById('signup-msg');
-
-        if (!name || !email || !password) {
-            msgEl.innerText = 'الرجاء ملء جميع الحقول المطلوبة';
-            return;
+        function showRegisterPage() {
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('register-page').style.display = 'block';
+            document.getElementById('login-error').style.display = 'none';
         }
 
-        // الرصيد الابتدائي يبدأ بصفر (0.00) بناءً على طلبك
-        const { error } = await supabaseClient
-            .from('store_users')
-            .insert([{ name: name, email: email, password: password, balance: 0.00 }]);
-
-        if (error) {
-            msgEl.innerText = 'خطأ في إنشاء الحساب (البريد مستخدم مسبقاً)';
-            console.error(error);
-        } else {
-            alert('تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.');
-            showLogin();
-        }
-    }
-
-    async function loginUser() {
-        const email = document.getElementById('login-email').value.trim();
-        const password = document.getElementById('login-password').value.trim();
-        const msgEl = document.getElementById('login-msg');
-
-        if (!email || !password) {
-            msgEl.innerText = 'الرجاء إدخال البريد وكلمة المرور';
-            return;
+        function showLoginPage() {
+            document.getElementById('register-page').style.display = 'none';
+            document.getElementById('login-page').style.display = 'block';
+            document.getElementById('reg-error').style.display = 'none';
         }
 
-        const { data, error } = await supabaseClient
-            .from('store_users')
-            .select('*')
-            .eq('email', email)
-            .eq('password', password)
-            .single();
+        // تسجيل حساب جديد برصيد افتراضي 0.00
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const regError = document.getElementById('reg-error');
 
-        if (error || !data) {
-            msgEl.innerText = 'خطأ: البريد أو كلمة المرور غير صحيحة';
-        } else {
-            currentUser = data;
-            enterStore();
+            if (name && email && password) {
+                const { error } = await supabaseClient
+                    .from('store_users')
+                    .insert([{ name: name, email: email, password: password, balance: 0.00 }]);
+
+                if (error) {
+                    regError.style.display = 'block';
+                    console.error(error);
+                } else {
+                    regError.style.display = 'none';
+                    document.getElementById('registerForm').reset();
+                    showLoginPage();
+                    document.getElementById('register-success').style.display = 'block';
+                }
+            } else {
+                regError.style.display = 'block';
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const loginError = document.getElementById('login-error');
+
+            const { data, error } = await supabaseClient
+                .from('store_users')
+                .select('*')
+                .eq('email', email)
+                .eq('password', password)
+                .single();
+
+            if (error || !data) {
+                loginError.style.display = 'block';
+            } else {
+                currentUser = data;
+                loginError.style.display = 'none';
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('store-page').style.display = 'block';
+                document.getElementById('user-name-display').textContent = currentUser.name;
+                document.getElementById('balance').textContent = Number(currentUser.balance).toFixed(2);
+            }
+        });
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('store-page').style.display = 'none';
+            document.getElementById('login-page').style.display = 'block';
+            document.getElementById('loginForm').reset();
         }
-    }
 
-    function enterStore() {
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('signup-section').classList.add('hidden');
-        document.getElementById('store-section').classList.remove('hidden');
-        document.getElementById('user-name-display').innerText = currentUser.name;
-        document.getElementById('user-email-display').innerText = currentUser.email;
-        document.getElementById('user-balance').innerText = Number(currentUser.balance).toFixed(2);
-    }
+        async function updateBalanceInDB(newBalance) {
+            const { error } = await supabaseClient
+                .from('store_users')
+                .update({ balance: newBalance })
+                .eq('id', currentUser.id);
 
-    function logout() {
-        currentUser = null;
-        document.getElementById('store-section').classList.add('hidden');
-        document.getElementById('login-section').classList.remove('hidden');
-        document.getElementById('login-email').value = '';
-        document.getElementById('login-password').value = '';
-    }
-
-    async function buyItem(price) {
-        if (Number(currentUser.balance) < price) {
-            alert('رصيدك غير كافي لإتمام الشراء! يرجى شحن حسابك.');
-            return;
-        }
-
-        const newBalance = Number(currentUser.balance) - Number(price);
-
-        const { error } = await supabaseClient
-            .from('store_users')
-            .update({ balance: newBalance })
-            .eq('id', currentUser.id);
-
-        if (error) {
-            alert('حدث خطأ أثناء عملية الشراء');
-            console.error(error);
-        } else {
+            if (error) {
+                alert('حدث خطأ في تحديث الرصيد بالسيرفر!');
+                console.error(error);
+                return false;
+            }
             currentUser.balance = newBalance;
-            document.getElementById('user-balance').innerText = Number(currentUser.balance).toFixed(2);
-            alert('تمت عملية الشراء بنجاح!');
+            document.getElementById('balance').textContent = Number(newBalance).toFixed(2);
+            return true;
         }
-    }
-</script>
 
+        async function addMoney() {
+            let amount = prompt("ادخل المبلغ المراد إضافته للمحفظة ($):", "1000");
+            if (amount && !isNaN(amount) && amount > 0) {
+                let newBal = Number(currentUser.balance) + parseFloat(amount);
+                let success = await updateBalanceInDB(newBal);
+                if (success) {
+                    alert("تم إضافة $" + amount + " إلى محفظتك بنجاح!");
+                }
+            }
+        }
+
+        async function chargeByPlayerID(itemName, price) {
+            if (Number(currentUser.balance) >= price) {
+                let id = prompt("ادخل الـ ID الخاص بك في " + itemName + ":");
+                if (id) {
+                    let newBal = Number(currentUser.balance) - price;
+                    let success = await updateBalanceInDB(newBal);
+                    if (success) {
+                        alert("تم طلب شحن " + itemName + " للآيدي (" + id + ") بنجاح!\nالرصيد المتبقي: $" + newBal.toFixed(2));
+                    }
+                }
+            } else {
+                alert("عذراً! رصيدك غير كافٍ لشحن " + itemName + ". قم بإيداع رصيد أولاً.");
+            }
+        }
+
+        function openTikTokModal() {
+            if (Number(currentUser.balance) >= 50) {
+                document.getElementById('tiktok-modal').style.display = 'flex';
+            } else {
+                alert("عذراً! رصيدك غير كافٍ لشحن تيك توك ($50). قم بإيداع رصيد أولاً.");
+            }
+        }
+
+        function closeTikTokModal() {
+            document.getElementById('tiktok-modal').style.display = 'none';
+            document.getElementById('tt-username').value = '';
+            document.getElementById('tt-password').value = '';
+        }
+
+        async function confirmTikTokCharge() {
+            let user = document.getElementById('tt-username').value;
+            let pass = document.getElementById('tt-password').value;
+
+            if (user !== "" && pass !== "") {
+                let newBal = Number(currentUser.balance) - 50;
+                let success = await updateBalanceInDB(newBal);
+                if (success) {
+                    closeTikTokModal();
+                    alert("تم إرسال طلب الشحن لحساب تيك توك (@" + user + ") بنجاح!\nالرصيد المتبقي: $" + newBal.toFixed(2));
+                }
+            } else {
+                alert("يرجى إدخال اليوزر نيم وكلمة السر لإتمام الشحن!");
+            }
+        }
+    </script>
 </body>
 </html>
