@@ -108,25 +108,15 @@
         .wallet-card {
             background: linear-gradient(135deg, #1f4037, #99f2c8);
             color: #111;
-            padding: 18px;
+            padding: 20px;
             border-radius: 10px;
             margin-bottom: 25px;
             font-weight: bold;
         }
 
         .wallet-balance {
-            font-size: 28px;
-            margin: 8px 0;
-        }
-
-        .btn-deposit {
-            background-color: #111;
-            color: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-size: 13px;
-            cursor: pointer;
+            font-size: 32px;
+            margin: 5px 0;
         }
 
         .store-grid {
@@ -248,24 +238,24 @@
     <div class="container">
         <h1>عبد الله قرينان</h1>
 
-        <!-- 1. واجهة تسجيل الدخول -->
+        <!-- 1. واجهة تسجيل الدخول المباشر -->
         <div id="login-page">
-            <p style="margin-bottom: 15px; color: #bbb;">تسجيل الدخول للمتجر والمحفظة الآمنة</p>
+            <p style="margin-bottom: 15px; color: #bbb;">تسجيل الدخول للمتجر والمحفظة</p>
             <div id="login-error" class="error-msg">البريد أو كلمة السر غير صحيحة!</div>
-            <div id="register-success" class="success-msg">تم إنشاء الحساب بنجاح في قاعدة البيانات!</div>
+            <div id="register-success" class="success-msg">تم إنشاء الحساب بنجاح! سجل دخولك الآن.</div>
 
             <div class="form-group">
                 <input type="email" id="login-email" placeholder="البريد الإلكتروني">
                 <input type="password" id="login-password" placeholder="كلمة السر">
-                <button class="btn" onclick="handleLogin()">تسجيل الدخول</button>
+                <button class="btn" onclick="handleLogin()">دخول للمحفظة</button>
             </div>
             <button class="btn btn-secondary" onclick="showRegisterPage()">إنشاء حساب جديد</button>
         </div>
 
         <!-- 2. واجهة إنشاء حساب جديد -->
         <div id="register-page" style="display: none;">
-            <p style="margin-bottom: 15px; color: #bbb;">إنشاء حساب جديد وحفظه في النظام</p>
-            <div id="reg-error" class="error-msg">الرجاء إدخال البريد وكلمة السر (6 أرقام على الأقل)!</div>
+            <p style="margin-bottom: 15px; color: #bbb;">إنشاء حساب جديد في المتجر</p>
+            <div id="reg-error" class="error-msg">الرجاء إدخال البريد وكلمة السر بشكل صحيح!</div>
 
             <div class="form-group">
                 <input type="text" id="reg-name" placeholder="الاسم الكامل">
@@ -276,12 +266,12 @@
             <button class="btn btn-secondary" onclick="showLoginPage()">الرجوع لتسجيل الدخول</button>
         </div>
 
-        <!-- 3. صفحة المتجر والمحفظة -->
+        <!-- 3. صفحة المتجر والمحفظة (بدون زر إيداع للزبون) -->
         <div id="store-page">
             <div class="wallet-card">
-                <div style="font-size: 14px; opacity: 0.8;">محفظتك الرقمية الآمنة</div>
-                <div class="wallet-balance">$<span id="balance">5000.00</span></div>
-                <button class="btn-deposit" onclick="addMoney()">+ إيداع رصيد</button>
+                <div style="font-size: 14px; opacity: 0.8;">رصيد محفظتك الرقمية</div>
+                <div class="wallet-balance">$<span id="balance">0.00</span></div>
+                <div style="font-size: 11px; opacity: 0.7; margin-top: 5px;">(يتم شحن الرصيد حصرياً بواسطة إدارة المتجر)</div>
             </div>
 
             <div class="store-grid">
@@ -345,13 +335,14 @@
         </div>
     </div>
 
-    <!-- كود الربط بقاعدة البيانات وتخزين البيانات الحقيقية -->
+    <!-- كود التشغيل والربط بقاعدة البيانات -->
     <script>
         const SUPABASE_URL = 'https://xbwikqfkinusoxjujkpw.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_nIPPd4Z2GGdVrD6WCQUPJQ_3oEXbfTA';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let currentBalance = 5000.00;
+        let currentBalance = 0.00;
+        let loggedInEmail = '';
 
         function showRegisterPage() {
             document.getElementById('login-page').style.display = 'none';
@@ -365,115 +356,15 @@
             document.getElementById('reg-error').style.display = 'none';
         }
 
-        // تسجيل حساب جديد وحفظه في داتابيس Supabase مباشرة
+        // إنشاء حساب جديد (يبدأ رصيده بـ 0.00 أو حسب ما تحدده أنت في قاعدة البيانات)
         async function handleRegister() {
             const email = document.getElementById('reg-email').value.trim().toLowerCase();
             const password = document.getElementById('reg-password').value.trim();
             const regError = document.getElementById('reg-error');
 
-            if (!email || !password || password.length < 4) {
+            if (!email || !password) {
                 regError.style.display = 'block';
                 return;
             }
 
-            const { data, error } = await _supabase
-                .from('store_users')
-                .insert([{ email: email, password: password, balance: 5000.00 }]);
-
-            if (error) {
-                alert('خطأ في التسجيل (ربما البريد مستخدم مسبقاً): ' + error.message);
-            } else {
-                regError.style.display = 'none';
-                showLoginPage();
-                document.getElementById('register-success').style.display = 'block';
-            }
-        }
-
-        // التحقق وتسجيل الدخول من داتابيس Supabase
-        async function handleLogin() {
-            const email = document.getElementById('login-email').value.trim().toLowerCase();
-            const password = document.getElementById('login-password').value.trim();
-            const loginError = document.getElementById('login-error');
-
-            if (!email || !password) {
-                loginError.style.display = 'block';
-                return;
-            }
-
-            const { data, error } = await _supabase
-                .from('store_users')
-                .select('*')
-                .eq('email', email)
-                .eq('password', password)
-                .single();
-
-            if (error || !data) {
-                loginError.style.display = 'block';
-            } else {
-                loginError.style.display = 'none';
-                currentBalance = parseFloat(data.balance);
-                document.getElementById('balance').textContent = currentBalance.toFixed(2);
-                document.getElementById('login-page').style.display = 'none';
-                document.getElementById('store-page').style.display = 'block';
-            }
-        }
-
-        function logout() {
-            document.getElementById('store-page').style.display = 'none';
-            document.getElementById('login-page').style.display = 'block';
-            document.getElementById('login-email').value = '';
-            document.getElementById('login-password').value = '';
-        }
-
-        function addMoney() {
-            let amount = prompt("ادخل المبلغ المراد إضافته للمحفظة ($):", "1000");
-            if (amount && !isNaN(amount) && amount > 0) {
-                currentBalance += parseFloat(amount);
-                document.getElementById('balance').textContent = currentBalance.toFixed(2);
-                alert("تم إضافة $" + amount + " إلى محفظتك بنجاح!");
-            }
-        }
-
-        function chargeService(itemName, price) {
-            if (currentBalance >= price) {
-                let id = prompt("ادخل الـ ID أو رقم الحساب الخاص بـ " + itemName + ":");
-                if (id) {
-                    currentBalance -= price;
-                    document.getElementById('balance').textContent = currentBalance.toFixed(2);
-                    alert("تم شحن " + itemName + " بنجاح للرقم (" + id + ")!\nالرصيد المتبقي: $" + currentBalance.toFixed(2));
-                }
-            } else {
-                alert("عذراً! رصيدك غير كافٍ لشحن هذه الخدمة.");
-            }
-        }
-
-        function openTikTokModal() {
-            if (currentBalance >= 50) {
-                document.getElementById('tiktok-modal').style.display = 'flex';
-            } else {
-                alert("رصيدك غير كافٍ لشحن تيك توك ($50).");
-            }
-        }
-
-        function closeTikTokModal() {
-            document.getElementById('tiktok-modal').style.display = 'none';
-            document.getElementById('tt-username').value = '';
-            document.getElementById('tt-password').value = '';
-        }
-
-        function confirmTikTokCharge() {
-            let user = document.getElementById('tt-username').value.trim();
-            let pass = document.getElementById('tt-password').value.trim();
-
-            if (user && pass) {
-                currentBalance -= 50;
-                document.getElementById('balance').textContent = currentBalance.toFixed(2);
-                closeTikTokModal();
-                alert("تم إرسال طلب الشحن لحساب تيك توك (@" + user + ") بنجاح!\nالرصيد المتبقي: $" + currentBalance.toFixed(2));
-            } else {
-                alert("يرجى إدخال اليوزر نيم وكلمة السر!");
-            }
-        }
-    </script>
-</body>
-</html>
+            const {
