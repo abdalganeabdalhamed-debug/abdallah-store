@@ -256,7 +256,7 @@
             cursor: pointer;
         }
 
-        /* صفحة إضافة الرصيد (بنكك / ميركاش) */
+        /* صفحة إضافة الرصيد الجديدة */
         #deposit-page {
             display: none;
             text-align: right;
@@ -418,13 +418,13 @@
             <div class="footer">والسلام</div>
         </div>
 
-        <!-- 4. واجهة صفحة إضافة الرصيد (تحويل بنكك / ميركاش) -->
+        <!-- 4. صفحة إضافة الرصيد (تحويل بنكك / ميركاش) -->
         <div id="deposit-page">
-            <h3 style="color: #38ef7d; margin-bottom: 15px; text-align: center;">إضافة رصيد للحساب</h3>
+            <h3 style="color: #38ef7d; margin-bottom: 15px; text-align: center;">إضافة رصيد إلى الحساب</h3>
             
             <div class="bank-info-box">
-                <p style="font-weight: bold; margin-bottom: 8px; color: #38ef7d;">معلومات التحويل المباشر:</p>
-                قم بالتحويل عبر التطبيق أدناه، ثم أرسل إيصال التحويل عبر الواتساب:
+                <p style="font-weight: bold; margin-bottom: 8px; color: #38ef7d;">تعليمات التحويل:</p>
+                قم بنسخ رقم الحساب أدناه، وحول المبلغ المطلوب عبر التطبيق، ثم تواصل معنا لإضافة الرصيد لحسابك:
                 <br><br>
                 📱 **تطبيق بنكك (Bankak):** <code>123456789</code><br>
                 💳 **ميركاش (MerCash):** <code>987654321</code><br>
@@ -452,7 +452,7 @@
         </div>
     </div>
 
-    <!-- كود الجافا سكريبت الأصلي للربط -->
+    <!-- كود الجافا سكريبت متصل مع Supabase -->
     <script>
         const SUPABASE_URL = 'https://jsptynjktxfetyxebwvo.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_xCxX3NCHHcnTWywv9eudZg_mAfImIYD';
@@ -487,7 +487,7 @@
             window.open('https://wa.me/249XXXXXXXXX?text=مرحباً عبد الله، لقد قمت بالتحويل لإضافة رصيد وهذا هو الإيصال.', '_blank');
         }
 
-        // 1. تسجيل حساب جديد (الرصيد الابتدائي 0.00)
+        // 1. تسجيل حساب جديد برصيد افتراضي 0.00
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -499,7 +499,7 @@
             if (name && email && password) {
                 const { error } = await supabaseClient
                     .from('store_users')
-                    .insert([{ name: name, email: email, password: password, balance: 0.00 }]);
+                    .insert([{ name: name, email: email, password: password, balance: 0.00 }]); // يبدأ رصيده بصفر
 
                 if (error) {
                     regError.style.display = 'block';
@@ -515,7 +515,7 @@
             }
         });
 
-        // 2. تسجيل الدخول
+        // 2. تسجيل الدخول والتحقق من Supabase
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -551,6 +551,7 @@
             document.getElementById('loginForm').reset();
         }
 
+        // تحديث الرصيد في قاعدة البيانات عند الشراء
         async function updateBalanceInDB(newBalance) {
             const { error } = await supabaseClient
                 .from('store_users')
