@@ -67,6 +67,11 @@
             border-color: #38ef7d;
         }
 
+        input[type="tel"] {
+            direction: ltr;
+            text-align: right;
+        }
+
         .btn {
             width: 100%;
             padding: 12px;
@@ -764,7 +769,7 @@
             return true;
         }
 
-        // تسجيل الطلبات بدقة مع يوزر التيك توك ورقم الواتساب
+        // تسجيل الطلبات بأسماء الأعمدة المباشرة والدقيقة 100%
         async function saveOrderToDB(serviceName, coins, price, targetAccount, waNumber) {
             const { error } = await supabaseClient
                 .from('orders')
@@ -772,10 +777,10 @@
                     user_name: currentUser.name,
                     user_email: currentUser.email,
                     service_name: serviceName,
-                    coins_amount: coins,
-                    total_price: price,
-                    target_account: targetAccount,
-                    whatsapp_number: waNumber,
+                    coins_amount: Number(coins),
+                    total_price: Number(price),
+                    target_account: String(targetAccount),
+                    whatsapp_number: String(waNumber),
                     status: 'pending'
                 }]);
 
