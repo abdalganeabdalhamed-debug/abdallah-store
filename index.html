@@ -228,7 +228,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
+            background-color: rgba(0,0,0,0.85);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -240,8 +240,44 @@
             border-radius: 12px;
             border: 1px solid #444;
             width: 90%;
-            max-width: 400px;
+            max-width: 420px;
+            text-align: right;
+        }
+
+        .coins-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .coin-btn {
+            background-color: #2b2b2b;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 10px;
             text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #fff;
+        }
+
+        .coin-btn.active {
+            border-color: #38ef7d;
+            background-color: rgba(56, 239, 125, 0.15);
+            color: #38ef7d;
+            font-weight: bold;
+        }
+
+        .total-price-box {
+            background-color: #2b2b2b;
+            border: 1px solid #38ef7d;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            color: #38ef7d;
+            margin: 15px 0;
         }
 
         .modal-btns {
@@ -271,7 +307,47 @@
             cursor: pointer;
         }
 
-        /* صفحة إضافة الرصيد الجديدة */
+        /* تصميم قسم طلباتي */
+        .orders-section {
+            margin-top: 25px;
+            text-align: right;
+        }
+
+        .orders-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #38ef7d;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 6px;
+        }
+
+        .order-card {
+            background-color: #2a2a2a;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .order-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .order-status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* صفحة إضافة الرصيد */
         #deposit-page {
             display: none;
             text-align: right;
@@ -411,7 +487,7 @@
                             <div class="item-price">شحن 2000 جوهرة - $100</div>
                         </div>
                     </div>
-                    <button class="btn-charge" onclick="chargeByPlayerID('فري فاير', 100)">شحن</button>
+                    <button class="btn-charge" onclick="chargeByPlayerID('فري فاير', 100, 2000)">شحن</button>
                 </div>
 
                 <!-- تيك توك -->
@@ -424,7 +500,7 @@
                         </div>
                         <div class="item-details">
                             <div class="item-title">تيك توك (TikTok)</div>
-                            <div class="item-price">شحن 1000 عملة - $50</div>
+                            <div class="item-price">تبدأ من 100 عملة - $5</div>
                         </div>
                     </div>
                     <button class="btn-charge" onclick="openTikTokModal()">شحن</button>
@@ -439,7 +515,7 @@
                             <div class="item-price">شحن 3000 ماسة - $150</div>
                         </div>
                     </div>
-                    <button class="btn-charge" onclick="chargeByPlayerID('إيمو', 150)">شحن</button>
+                    <button class="btn-charge" onclick="chargeByPlayerID('إيمو', 150, 3000)">شحن</button>
                 </div>
 
                 <!-- ببجي -->
@@ -451,22 +527,30 @@
                             <div class="item-price">شحن 2000 شدة - $120</div>
                         </div>
                     </div>
-                    <button class="btn-charge" onclick="chargeByPlayerID('ببجي شدات', 120)">شحن</button>
+                    <button class="btn-charge" onclick="chargeByPlayerID('ببجي شدات', 120, 2000)">شحن</button>
                 </div>
 
+            </div>
+
+            <!-- قسم سجل طلباتي المضاف -->
+            <div class="orders-section">
+                <div class="orders-title">📋 سجل طلباتي</div>
+                <div id="user-orders-list">
+                    <p style="font-size: 13px; color: #aaa;">جاري تحميل طلباتك...</p>
+                </div>
             </div>
 
             <p style="margin-top: 20px; font-size: 13px; color: #aaa; text-align: center;">شكراً عملائنا الكرام نحن دوماً في خدماتكم للتواصل:</p>
 
             <div class="social-btns">
-                <a href="https://wa.me/" target="_blank" class="btn-social btn-wa">واتساب (WhatsApp)</a>
-                <a href="https://facebook.com/" target="_blank" class="btn-social btn-fb">فيسبوك (Facebook)</a>
+                <a href="https://wa.me/249XXXXXXXXX?text=مرحباً عبد الله، أود التواصل معك بخصوص المتجر" target="_blank" class="btn-social btn-wa">واتساب (WhatsApp)</a>
+                <a href="https://facebook.com/your-page-name" target="_blank" class="btn-social btn-fb">فيسبوك (Facebook)</a>
             </div>
 
             <div class="footer">والسلام</div>
         </div>
 
-        <!-- 6. صفحة إضافة الرصيد (تحويل بنكك / ميركاش) -->
+        <!-- 6. صفحة إضافة الرصيد -->
         <div id="deposit-page">
             <h3 style="color: #38ef7d; margin-bottom: 15px; text-align: center;">إضافة رصيد إلى الحساب</h3>
             
@@ -479,7 +563,7 @@
                 👤 **اسم المستفيد:** عبد الله قرينان
             </div>
 
-            <button class="btn" style="background-color: #25D366; margin-bottom: 10px;" onclick="openWhatsApp()">إرسال الإيصال عبر الواتساب</button>
+            <button class="btn" style="background-color: #25D366; margin-bottom: 10px;" onclick="openWhatsAppDeposit()">إرسال الإيصال عبر الواتساب</button>
             <button class="btn btn-secondary" onclick="backToStore()">العودة للمتجر</button>
         </div>
 
@@ -488,13 +572,34 @@
     <!-- نافذة تيك توك -->
     <div id="tiktok-modal" class="modal">
         <div class="modal-content">
-            <h3 style="color: #38ef7d; margin-bottom: 15px;">شحن حساب تيك توك</h3>
-            <div class="form-group">
-                <input type="text" id="tt-username" placeholder="ادخل اليوزر نيم (Username)">
-                <input type="password" id="tt-password" placeholder="ادخل كلمة السر (Password)">
+            <h3 style="color: #38ef7d; margin-bottom: 15px; text-align: center;">شحن عملات تيك توك</h3>
+            
+            <p style="font-size: 13px; color: #bbb; margin-bottom: 10px;">اختر كمية العملات المطلوبة:</p>
+
+            <div class="coins-grid">
+                <div class="coin-btn active" onclick="setTikTokCoins(100, 5, this)">100 عملة ($5)</div>
+                <div class="coin-btn" onclick="setTikTokCoins(200, 10, this)">200 عملة ($10)</div>
+                <div class="coin-btn" onclick="setTikTokCoins(500, 25, this)">500 عملة ($25)</div>
+                <div class="coin-btn" onclick="setTikTokCoins(1000, 50, this)">1000 عملة ($50)</div>
             </div>
+
+            <div class="coin-btn" id="custom-btn" onclick="setTikTokCustom(this)" style="margin-bottom: 10px;">أخرى (تحديد كمية خاصة)</div>
+
+            <div id="custom-input-div" style="display: none; margin-bottom: 10px;">
+                <input type="number" id="tt-custom-coins" placeholder="ادخل عدد العملات (أقل حد 100)" min="100" oninput="onCustomCoinsInput()">
+            </div>
+
+            <div class="total-price-box">
+                الإجمالي المطلوب خصمه: $<span id="tt-total-price">5.00</span>
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="tt-username" placeholder="ادخل اليوزر نيم في تيك توك (@username)">
+                <input type="tel" id="tt-whatsapp" placeholder="ادخل رقم الواتساب الخاص بك">
+            </div>
+
             <div class="modal-btns">
-                <button class="btn-confirm" onclick="confirmTikTokCharge()">تأكيد الشحن ($50)</button>
+                <button class="btn-confirm" onclick="confirmTikTokCharge()">تأكيد الشراء</button>
                 <button class="btn-cancel" onclick="closeTikTokModal()">إلغاء</button>
             </div>
         </div>
@@ -509,7 +614,11 @@
         let currentUser = null;
         let resetEmail = "";
 
-        // عند تحميل الصفحة مفتاح الفحص للاستمرارية
+        // متغيرات التيك توك
+        let ttCoins = 100;
+        let ttPrice = 5;
+        let isCustom = false;
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = localStorage.getItem('store_user');
             if (savedUser) {
@@ -518,7 +627,6 @@
             }
         });
 
-        // التنقل بين الصفحات
         function hideAllPages() {
             document.getElementById('login-page').style.display = 'none';
             document.getElementById('register-page').style.display = 'none';
@@ -533,6 +641,7 @@
             document.getElementById('store-page').style.display = 'block';
             document.getElementById('user-name-display').textContent = currentUser.name;
             document.getElementById('balance').textContent = Number(currentUser.balance).toFixed(2);
+            fetchUserOrders(); // تحميل الطلبات الخاصة بالمستخدم
         }
 
         function showRegisterPage() {
@@ -571,11 +680,11 @@
             document.getElementById('store-page').style.display = 'block';
         }
 
-        function openWhatsApp() {
+        function openWhatsAppDeposit() {
             window.open('https://wa.me/249XXXXXXXXX?text=مرحباً عبد الله، لقد قمت بالتحويل لإضافة رصيد وهذا هو الإيصال.', '_blank');
         }
 
-        // 1. تسجيل حساب جديد برصيد افتراضي 0.00
+        // 1. تسجيل حساب جديد
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -603,7 +712,7 @@
             }
         });
 
-        // 2. تسجيل الدخول وحفظ الجلسة في localStorage
+        // 2. تسجيل الدخول
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -622,13 +731,13 @@
                 loginError.style.display = 'block';
             } else {
                 currentUser = data;
-                localStorage.setItem('store_user', JSON.stringify(currentUser)); // حفظ الحساب للمرات القادمة
+                localStorage.setItem('store_user', JSON.stringify(currentUser));
                 loginError.style.display = 'none';
                 loadStoreView();
             }
         });
 
-        // 3. التحقق من وجود الإيميل عند طلب نسيان كلمة السر
+        // 3. نسيان كلمة السر
         document.getElementById('forgotForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -650,7 +759,7 @@
             }
         });
 
-        // 4. تعيين كلمة السر الجديدة في Supabase
+        // 4. اعادة تعيين كلمة السر
         document.getElementById('resetForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -682,12 +791,11 @@
 
         function logout() {
             currentUser = null;
-            localStorage.removeItem('store_user'); // مسح الحساب المحفوظ
+            localStorage.removeItem('store_user');
             showLoginPage();
             document.getElementById('loginForm').reset();
         }
 
-        // تحديث الرصيد في قاعدة البيانات وفي localStorage
         async function updateBalanceInDB(newBalance) {
             const { error } = await supabaseClient
                 .from('store_users')
@@ -700,18 +808,98 @@
                 return false;
             }
             currentUser.balance = newBalance;
-            localStorage.setItem('store_user', JSON.stringify(currentUser)); // تحديث الرصيد المحفوظ
+            localStorage.setItem('store_user', JSON.stringify(currentUser));
             document.getElementById('balance').textContent = Number(newBalance).toFixed(2);
             return true;
         }
 
-        async function chargeByPlayerID(itemName, price) {
+        // حفظ كل طلب في صف جديد (Row)
+        async function saveOrderToDB(serviceName, coins, price, targetAccount, waNumber) {
+            const newOrderData = {
+                user_name: String(currentUser.name),
+                user_email: String(currentUser.email),
+                service_name: String(serviceName),
+                coins_amount: Number(coins),
+                total_price: Number(price),
+                target_account: String(targetAccount),
+                whatsapp_number: String(waNumber),
+                status: 'قيد الانتظار' // الحالة الافتراضية بالعربي
+            };
+
+            const { error } = await supabaseClient
+                .from('orders')
+                .insert([newOrderData]);
+
+            if (error) {
+                console.error('حدث خطأ في حفظ الطلب:', error);
+                alert('تنبيه: تم خصم الرصيد ولكن حدث خطأ في تسجيل الطلب بالسيرفر!');
+            } else {
+                fetchUserOrders(); // إعادة جلب الطلبات لتظهر في القائمة فوراً
+            }
+        }
+
+        // جلب طلبات المستخدم الحالية وعرض حالتها بالعربي مباشرة
+        async function fetchUserOrders() {
+            const listContainer = document.getElementById('user-orders-list');
+            if (!currentUser) return;
+
+            const { data, error } = await supabaseClient
+                .from('orders')
+                .select('*')
+                .eq('user_email', currentUser.email)
+                .order('created_at', { ascending: false });
+
+            if (error || !data || data.length === 0) {
+                listContainer.innerHTML = '<p style="font-size: 13px; color: #888;">لا توجد لديك طلبات قائمة حالياً.</p>';
+                return;
+            }
+
+            let html = '';
+            data.forEach(order => {
+                let statusText = order.status || 'قيد الانتظار';
+                let statusBg = '#333';
+                let statusColor = '#f1c40f'; // لون أصفر افتراضي
+
+                // ألوان الحالات بالعربي من Supabase
+                if (statusText === 'مكتمل' || statusText === 'completed') {
+                    statusText = 'مكتمل';
+                    statusColor = '#111';
+                    statusBg = '#38ef7d'; // أخضر
+                } else if (statusText === 'فشل' || statusText === 'ملغي' || statusText === 'failed') {
+                    statusText = 'فشل / ملغي';
+                    statusColor = '#fff';
+                    statusBg = '#dc3545'; // أحمر
+                } else if (statusText === 'قيد التنفيذ') {
+                    statusColor = '#fff';
+                    statusBg = '#00a8ff'; // أزرق
+                }
+
+                html += `
+                    <div class="order-card">
+                        <div class="order-info">
+                            <strong>${order.service_name} (${order.coins_amount} عملة)</strong>
+                            <span style="font-size: 12px; color: #aaa;">الحساب: ${order.target_account}</span>
+                            <span style="font-size: 12px; color: #aaa;">المبلغ: $${Number(order.total_price).toFixed(2)}</span>
+                        </div>
+                        <span class="order-status-badge" style="background-color: ${statusBg}; color: ${statusColor};">
+                            ${statusText}
+                        </span>
+                    </div>
+                `;
+            });
+
+            listContainer.innerHTML = html;
+        }
+
+        async function chargeByPlayerID(itemName, price, defaultCoins) {
             if (Number(currentUser.balance) >= price) {
                 let id = prompt("ادخل الـ ID الخاص بك في " + itemName + ":");
-                if (id) {
+                let wa = prompt("ادخل رقم الواتساب الخاص بك للتواصل:");
+                if (id && wa) {
                     let newBal = Number(currentUser.balance) - price;
                     let success = await updateBalanceInDB(newBal);
                     if (success) {
+                        await saveOrderToDB(itemName, defaultCoins, price, id, wa);
                         alert("تم طلب شحن " + itemName + " للآيدي (" + id + ") بنجاح!\nالرصيد المتبقي: $" + newBal.toFixed(2));
                     }
                 }
@@ -720,33 +908,78 @@
             }
         }
 
+        /* --- وظائف نافذة تيك توك --- */
         function openTikTokModal() {
-            if (Number(currentUser.balance) >= 50) {
-                document.getElementById('tiktok-modal').style.display = 'flex';
-            } else {
-                alert("عذراً! رصيدك غير كافٍ لشحن تيك توك ($50). قم بإضافة رصيد أولاً.");
-            }
+            document.getElementById('tiktok-modal').style.display = 'flex';
         }
 
         function closeTikTokModal() {
             document.getElementById('tiktok-modal').style.display = 'none';
             document.getElementById('tt-username').value = '';
-            document.getElementById('tt-password').value = '';
+            document.getElementById('tt-whatsapp').value = '';
+            document.getElementById('tt-custom-coins').value = '';
+        }
+
+        function clearCoinsButtons() {
+            document.querySelectorAll('.coin-btn').forEach(b => b.classList.remove('active'));
+        }
+
+        function setTikTokCoins(coins, price, el) {
+            isCustom = false;
+            clearCoinsButtons();
+            el.classList.add('active');
+            document.getElementById('custom-input-div').style.display = 'none';
+            ttCoins = coins;
+            ttPrice = price;
+            document.getElementById('tt-total-price').textContent = ttPrice.toFixed(2);
+        }
+
+        function setTikTokCustom(el) {
+            isCustom = true;
+            clearCoinsButtons();
+            el.classList.add('active');
+            document.getElementById('custom-input-div').style.display = 'block';
+            onCustomCoinsInput();
+        }
+
+        function onCustomCoinsInput() {
+            if (!isCustom) return;
+            let inputVal = parseInt(document.getElementById('tt-custom-coins').value);
+            if (isNaN(inputVal) || inputVal < 100) {
+                ttCoins = 0;
+                ttPrice = 0;
+                document.getElementById('tt-total-price').textContent = "0.00";
+            } else {
+                ttCoins = inputVal;
+                ttPrice = inputVal * 0.05;
+                document.getElementById('tt-total-price').textContent = ttPrice.toFixed(2);
+            }
         }
 
         async function confirmTikTokCharge() {
-            let user = document.getElementById('tt-username').value;
-            let pass = document.getElementById('tt-password').value;
+            let user = document.getElementById('tt-username').value.trim();
+            let wa = document.getElementById('tt-whatsapp').value.trim();
 
-            if (user !== "" && pass !== "") {
-                let newBal = Number(currentUser.balance) - 50;
+            if (isCustom && ttCoins < 100) {
+                alert("أقل عدد عملات للشحن هو 100 عملة!");
+                return;
+            }
+
+            if (!user || !wa) {
+                alert("يرجى إدخال اليوزر نيم ورقم الواتساب!");
+                return;
+            }
+
+            if (Number(currentUser.balance) >= ttPrice) {
+                let newBal = Number(currentUser.balance) - ttPrice;
                 let success = await updateBalanceInDB(newBal);
                 if (success) {
+                    await saveOrderToDB('تيك توك', ttCoins, ttPrice, user, wa);
                     closeTikTokModal();
-                    alert("تم إرسال طلب الشحن لحساب تيك توك (@" + user + ") بنجاح!\nالرصيد المتبقي: $" + newBal.toFixed(2));
+                    alert("تم طلب شحن " + ttCoins + " عملة تيك توك للحساب (@" + user + ") بنجاح!\nالمبلغ المخصوم: $" + ttPrice.toFixed(2) + "\nالرصيد المتبقي: $" + newBal.toFixed(2));
                 }
             } else {
-                alert("يرجى إدخال اليوزر نيم وكلمة السر لإتمام الشحن!");
+                alert("عذراً! رصيدك الحالي ($" + Number(currentUser.balance).toFixed(2) + ") غير كافٍ لشراء هذه الكمية ($" + ttPrice.toFixed(2) + ").");
             }
         }
     </script>
