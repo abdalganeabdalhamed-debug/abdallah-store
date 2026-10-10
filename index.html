@@ -307,7 +307,7 @@
             cursor: pointer;
         }
 
-        /* صفحة إضافة الرصيد الجديدة */
+        /* صفحة إضافة الرصيد */
         #deposit-page {
             display: none;
             text-align: right;
@@ -502,7 +502,7 @@
             <div class="footer">والسلام</div>
         </div>
 
-        <!-- 6. صفحة إضافة الرصيد (تحويل بنكك / ميركاش) -->
+        <!-- 6. صفحة إضافة الرصيد -->
         <div id="deposit-page">
             <h3 style="color: #38ef7d; margin-bottom: 15px; text-align: center;">إضافة رصيد إلى الحساب</h3>
             
@@ -764,12 +764,11 @@
             return true;
         }
 
-        // تسجيل الطلبات في جدول orders
+        // تسجيل الطلبات في جدول orders المحدث
         async function saveOrderToDB(serviceName, coins, price, targetAccount, waNumber) {
             const { error } = await supabaseClient
                 .from('orders')
                 .insert([{
-                    user_id: currentUser.id,
                     user_name: currentUser.name,
                     user_email: currentUser.email,
                     service_name: serviceName,
@@ -782,6 +781,7 @@
 
             if (error) {
                 console.error('حدث خطأ في حفظ الطلب:', error);
+                alert('تنبيه: تم خصم الرصيد ولكن حدث خطأ في تسجيل الطلب بالسيرفر!');
             }
         }
 
