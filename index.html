@@ -91,6 +91,21 @@
             background-color: rgba(56, 239, 125, 0.1);
         }
 
+        .forgot-link {
+            display: block;
+            margin-top: 12px;
+            color: #aaa;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .forgot-link:hover {
+            color: #38ef7d;
+            text-decoration: underline;
+        }
+
         .error-msg {
             color: #ff4d4d;
             font-size: 14px;
@@ -312,6 +327,7 @@
             
             <div id="login-error" class="error-msg">البريد أو كلمة السر غير صحيحة!</div>
             <div id="register-success" class="success-msg">تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.</div>
+            <div id="reset-success" class="success-msg">تم تغيير كلمة السر بنجاح! يمكنك الآن تسجيل الدخول.</div>
 
             <form id="loginForm">
                 <div class="form-group">
@@ -321,10 +337,42 @@
                 </div>
             </form>
 
+            <span class="forgot-link" onclick="showForgotPasswordPage()">هل نسيت كلمة السر؟</span>
             <button class="btn btn-secondary" onclick="showRegisterPage()">إنشاء حساب جديد (Create Account)</button>
         </div>
 
-        <!-- 2. واجهة إنشاء حساب جديد -->
+        <!-- 2. واجهة طلب البريد عند نسيان كلمة السر -->
+        <div id="forgot-password-page" style="display: none;">
+            <p style="margin-bottom: 15px; color: #bbb;">أدخل بريدك الإلكتروني المسجل لاستعادة كلمة السر</p>
+            
+            <div id="forgot-error" class="error-msg">هذا البريد الإلكتروني غير مسجل لدينا!</div>
+
+            <form id="forgotForm">
+                <div class="form-group">
+                    <input type="email" id="forgot-email" placeholder="ادخل بريدك الإلكتروني الصحيح" required>
+                    <button type="submit" class="btn">متابعة</button>
+                </div>
+            </form>
+
+            <button class="btn btn-secondary" onclick="showLoginPage()">إلغاء والرجوع</button>
+        </div>
+
+        <!-- 3. واجهة كتابة كلمة السر الجديدة -->
+        <div id="reset-password-page" style="display: none;">
+            <p style="margin-bottom: 15px; color: #bbb;">أدخل كلمة السر الجديدة للحساب</p>
+            
+            <div id="reset-error" class="error-msg">كلمتا السر غير متطابقتين!</div>
+
+            <form id="resetForm">
+                <div class="form-group">
+                    <input type="password" id="new-password" placeholder="كلمة السر الجديدة" required>
+                    <input type="password" id="confirm-password" placeholder="تأكيد كلمة السر الجديدة" required>
+                    <button type="submit" class="btn">حفظ كلمة السر الجديدة</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 4. واجهة إنشاء حساب جديد -->
         <div id="register-page" style="display: none;">
             <p style="margin-bottom: 15px; color: #bbb;">أدخل بياناتك لإنشاء حساب جديد</p>
             
@@ -342,7 +390,7 @@
             <button class="btn btn-secondary" onclick="showLoginPage()">الرجوع لتسجيل الدخول</button>
         </div>
 
-        <!-- 3. الصفحة الثانية: متجر الشحن والمحفظة -->
+        <!-- 5. الصفحة الثانية: متجر الشحن والمحفظة -->
         <div id="store-page">
             
             <div class="wallet-card">
@@ -418,7 +466,7 @@
             <div class="footer">والسلام</div>
         </div>
 
-        <!-- 4. صفحة إضافة الرصيد (تحويل بنكك / ميركاش) -->
+        <!-- 6. صفحة إضافة الرصيد (تحويل بنكك / ميركاش) -->
         <div id="deposit-page">
             <h3 style="color: #38ef7d; margin-bottom: 15px; text-align: center;">إضافة رصيد إلى الحساب</h3>
             
@@ -459,18 +507,42 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
+        let resetEmail = ""; // لتخزين بريد المستخدم عند إعادة تعيين كلمة السر
 
         // التنقل بين الصفحات
-        function showRegisterPage() {
+        function hideAllPages() {
             document.getElementById('login-page').style.display = 'none';
+            document.getElementById('register-page').style.display = 'none';
+            document.getElementById('forgot-password-page').style.display = 'none';
+            document.getElementById('reset-password-page').style.display = 'none';
+            document.getElementById('store-page').style.display = 'none';
+            document.getElementById('deposit-page').style.display = 'none';
+        }
+
+        function showRegisterPage() {
+            hideAllPages();
             document.getElementById('register-page').style.display = 'block';
-            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('reg-error').style.display = 'none';
         }
 
         function showLoginPage() {
-            document.getElementById('register-page').style.display = 'none';
+            hideAllPages();
             document.getElementById('login-page').style.display = 'block';
-            document.getElementById('reg-error').style.display = 'none';
+            document.getElementById('login-error').style.display = 'none';
+        }
+
+        function showForgotPasswordPage() {
+            hideAllPages();
+            document.getElementById('forgot-password-page').style.display = 'block';
+            document.getElementById('forgot-error').style.display = 'none';
+            document.getElementById('forgotForm').reset();
+        }
+
+        function showResetPasswordPage() {
+            hideAllPages();
+            document.getElementById('reset-password-page').style.display = 'block';
+            document.getElementById('reset-error').style.display = 'none';
+            document.getElementById('resetForm').reset();
         }
 
         function showDepositPage() {
@@ -499,7 +571,7 @@
             if (name && email && password) {
                 const { error } = await supabaseClient
                     .from('store_users')
-                    .insert([{ name: name, email: email, password: password, balance: 0.00 }]); // يبدأ رصيده بصفر
+                    .insert([{ name: name, email: email, password: password, balance: 0.00 }]);
 
                 if (error) {
                     regError.style.display = 'block';
@@ -535,19 +607,68 @@
             } else {
                 currentUser = data;
                 loginError.style.display = 'none';
-                document.getElementById('login-page').style.display = 'none';
+                hideAllPages();
                 document.getElementById('store-page').style.display = 'block';
-                document.getElementById('deposit-page').style.display = 'none';
                 document.getElementById('user-name-display').textContent = currentUser.name;
                 document.getElementById('balance').textContent = Number(currentUser.balance).toFixed(2);
             }
         });
 
+        // 3. التحقق من وجود الإيميل عند طلب نسيان كلمة السر
+        document.getElementById('forgotForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('forgot-email').value.trim();
+            const forgotError = document.getElementById('forgot-error');
+
+            const { data, error } = await supabaseClient
+                .from('store_users')
+                .select('email')
+                .eq('email', email)
+                .single();
+
+            if (error || !data) {
+                forgotError.style.display = 'block';
+            } else {
+                forgotError.style.display = 'none';
+                resetEmail = email; // حفظ الإيميل للانتقال للخطوة التالية
+                showResetPasswordPage();
+            }
+        });
+
+        // 4. تعيين كلمة السر الجديدة في Supabase
+        document.getElementById('resetForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('new-password').value.trim();
+            const confirmPassword = document.getElementById('confirm-password').value.trim();
+            const resetError = document.getElementById('reset-error');
+
+            if (newPassword !== confirmPassword) {
+                resetError.textContent = "كلمتا السر غير متطابقتين!";
+                resetError.style.display = 'block';
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('store_users')
+                .update({ password: newPassword })
+                .eq('email', resetEmail);
+
+            if (error) {
+                resetError.textContent = "حدث خطأ أثناء تحديث كلمة السر، حاول مرة أخرى.";
+                resetError.style.display = 'block';
+                console.error(error);
+            } else {
+                resetError.style.display = 'none';
+                showLoginPage();
+                document.getElementById('reset-success').style.display = 'block';
+            }
+        });
+
         function logout() {
             currentUser = null;
-            document.getElementById('store-page').style.display = 'none';
-            document.getElementById('deposit-page').style.display = 'none';
-            document.getElementById('login-page').style.display = 'block';
+            showLoginPage();
             document.getElementById('loginForm').reset();
         }
 
