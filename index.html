@@ -764,7 +764,7 @@
             return true;
         }
 
-        // تسجيل الطلبات بدقة مع يوزر التيك توك ورقم الواتساب
+        // تسجيل الطلبات في جدول orders المحدث
         async function saveOrderToDB(serviceName, coins, price, targetAccount, waNumber) {
             const { error } = await supabaseClient
                 .from('orders')
