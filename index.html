@@ -228,7 +228,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
+            background-color: rgba(0,0,0,0.85);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -240,8 +240,44 @@
             border-radius: 12px;
             border: 1px solid #444;
             width: 90%;
-            max-width: 400px;
+            max-width: 420px;
+            text-align: right;
+        }
+
+        .coins-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .coin-btn {
+            background-color: #2b2b2b;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 10px;
             text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #fff;
+        }
+
+        .coin-btn.active {
+            border-color: #38ef7d;
+            background-color: rgba(56, 239, 125, 0.15);
+            color: #38ef7d;
+            font-weight: bold;
+        }
+
+        .total-price-box {
+            background-color: #2b2b2b;
+            border: 1px solid #38ef7d;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            color: #38ef7d;
+            margin: 15px 0;
         }
 
         .modal-btns {
@@ -424,7 +460,7 @@
                         </div>
                         <div class="item-details">
                             <div class="item-title">تيك توك (TikTok)</div>
-                            <div class="item-price">شحن 1000 عملة - $50</div>
+                            <div class="item-price">تبدأ من 100 عملة - $5</div>
                         </div>
                     </div>
                     <button class="btn-charge" onclick="openTikTokModal()">شحن</button>
@@ -459,9 +495,7 @@
             <p style="margin-top: 20px; font-size: 13px; color: #aaa; text-align: center;">شكراً عملائنا الكرام نحن دوماً في خدماتكم للتواصل:</p>
 
             <div class="social-btns">
-                <!-- استبدل الرقم أدناه برقم واتساب الخاص بك مع رمز الدولة (مثال: 249912345678) -->
                 <a href="https://wa.me/249XXXXXXXXX?text=مرحباً عبد الله، أود التواصل معك بخصوص المتجر" target="_blank" class="btn-social btn-wa">واتساب (WhatsApp)</a>
-                <!-- استبدل رابط فيسبوك أدناه برابط صفحتك الشخصية أو صفحة متجرك -->
                 <a href="https://facebook.com/your-page-name" target="_blank" class="btn-social btn-fb">فيسبوك (Facebook)</a>
             </div>
 
@@ -487,16 +521,37 @@
 
     </div>
 
-    <!-- نافذة تيك توك -->
+    <!-- نافذة تيك توك المحدّثة -->
     <div id="tiktok-modal" class="modal">
         <div class="modal-content">
-            <h3 style="color: #38ef7d; margin-bottom: 15px;">شحن حساب تيك توك</h3>
-            <div class="form-group">
-                <input type="text" id="tt-username" placeholder="ادخل اليوزر نيم (Username)">
-                <input type="password" id="tt-password" placeholder="ادخل كلمة السر (Password)">
+            <h3 style="color: #38ef7d; margin-bottom: 15px; text-align: center;">شحن عملات تيك توك</h3>
+            
+            <p style="font-size: 13px; color: #bbb; margin-bottom: 10px;">اختر كمية العملات المطلوبة:</p>
+
+            <div class="coins-grid">
+                <div class="coin-btn active" onclick="setTikTokCoins(100, 5, this)">100 عملة ($5)</div>
+                <div class="coin-btn" onclick="setTikTokCoins(200, 10, this)">200 عملة ($10)</div>
+                <div class="coin-btn" onclick="setTikTokCoins(500, 25, this)">500 عملة ($25)</div>
+                <div class="coin-btn" onclick="setTikTokCoins(1000, 50, this)">1000 عملة ($50)</div>
             </div>
+
+            <div class="coin-btn" id="custom-btn" onclick="setTikTokCustom(this)" style="margin-bottom: 10px;">أخرى (تحديد كمية خاصة)</div>
+
+            <div id="custom-input-div" style="display: none; margin-bottom: 10px;">
+                <input type="number" id="tt-custom-coins" placeholder="ادخل عدد العملات (أقل حد 100)" min="100" oninput="onCustomCoinsInput()">
+            </div>
+
+            <div class="total-price-box">
+                الإجمالي المطلوبة خصمه: $<span id="tt-total-price">5.00</span>
+            </div>
+
+            <div class="form-group">
+                <input type="text" id="tt-username" placeholder="ادخل اليوزر نيم في تيك توك (@username)">
+                <input type="tel" id="tt-whatsapp" placeholder="ادخل رقم الواتساب الخاص بك">
+            </div>
+
             <div class="modal-btns">
-                <button class="btn-confirm" onclick="confirmTikTokCharge()">تأكيد الشحن ($50)</button>
+                <button class="btn-confirm" onclick="confirmTikTokCharge()">تأكيد الشراء</button>
                 <button class="btn-cancel" onclick="closeTikTokModal()">إلغاء</button>
             </div>
         </div>
@@ -510,6 +565,11 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
         let resetEmail = "";
+
+        // متغيرات التيك توك
+        let ttCoins = 100;
+        let ttPrice = 5;
+        let isCustom = false;
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = localStorage.getItem('store_user');
@@ -572,10 +632,10 @@
         }
 
         function openWhatsAppDeposit() {
-            // استبدل الرقم أدناه برقمك الخاص
             window.open('https://wa.me/249XXXXXXXXX?text=مرحباً عبد الله، لقد قمت بالتحويل لإضافة رصيد وهذا هو الإيصال.', '_blank');
         }
 
+        // 1. تسجيل حساب جديد
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -603,6 +663,7 @@
             }
         });
 
+        // 2. تسجيل الدخول
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -627,6 +688,7 @@
             }
         });
 
+        // 3. نسيان كلمة السر
         document.getElementById('forgotForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -648,6 +710,7 @@
             }
         });
 
+        // 4. اعادة تعيين كلمة السر
         document.getElementById('resetForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -716,33 +779,77 @@
             }
         }
 
+        /* --- وظائف نافذة تيك توك المخصصة فقط --- */
         function openTikTokModal() {
-            if (Number(currentUser.balance) >= 50) {
-                document.getElementById('tiktok-modal').style.display = 'flex';
-            } else {
-                alert("عذراً! رصيدك غير كافٍ لشحن تيك توك ($50). قم بإضافة رصيد أولاً.");
-            }
+            document.getElementById('tiktok-modal').style.display = 'flex';
         }
 
         function closeTikTokModal() {
             document.getElementById('tiktok-modal').style.display = 'none';
             document.getElementById('tt-username').value = '';
-            document.getElementById('tt-password').value = '';
+            document.getElementById('tt-whatsapp').value = '';
+            document.getElementById('tt-custom-coins').value = '';
+        }
+
+        function clearCoinsButtons() {
+            document.querySelectorAll('.coin-btn').forEach(b => b.classList.remove('active'));
+        }
+
+        function setTikTokCoins(coins, price, el) {
+            isCustom = false;
+            clearCoinsButtons();
+            el.classList.add('active');
+            document.getElementById('custom-input-div').style.display = 'none';
+            ttCoins = coins;
+            ttPrice = price;
+            document.getElementById('tt-total-price').textContent = ttPrice.toFixed(2);
+        }
+
+        function setTikTokCustom(el) {
+            isCustom = true;
+            clearCoinsButtons();
+            el.classList.add('active');
+            document.getElementById('custom-input-div').style.display = 'block';
+            onCustomCoinsInput();
+        }
+
+        function onCustomCoinsInput() {
+            if (!isCustom) return;
+            let inputVal = parseInt(document.getElementById('tt-custom-coins').value);
+            if (isNaN(inputVal) || inputVal < 100) {
+                ttCoins = 0;
+                ttPrice = 0;
+                document.getElementById('tt-total-price').textContent = "0.00";
+            } else {
+                ttCoins = inputVal;
+                ttPrice = inputVal * 0.05; // 100 عملة بـ 5$
+                document.getElementById('tt-total-price').textContent = ttPrice.toFixed(2);
+            }
         }
 
         async function confirmTikTokCharge() {
-            let user = document.getElementById('tt-username').value;
-            let pass = document.getElementById('tt-password').value;
+            let user = document.getElementById('tt-username').value.trim();
+            let wa = document.getElementById('tt-whatsapp').value.trim();
 
-            if (user !== "" && pass !== "") {
-                let newBal = Number(currentUser.balance) - 50;
+            if (isCustom && ttCoins < 100) {
+                alert("أقل عدد عملات للشحن هو 100 عملة!");
+                return;
+            }
+
+            if (!user || !wa) {
+                alert("يرجى أدخال اليوزر نيم ورقم الواتساب!");
+                return;
+            }
+
+            if (Number(currentUser.balance) >= ttPrice) {
+                let newBal = Number(currentUser.balance) - ttPrice;
                 let success = await updateBalanceInDB(newBal);
                 if (success) {
                     closeTikTokModal();
-                    alert("تم إرسال طلب الشحن لحساب تيك توك (@" + user + ") بنجاح!\nالرصيد المتبقي: $" + newBal.toFixed(2));
+                    alert("تم طلب شحن " + ttCoins + " عملة تيك توك للحساب (@" + user + ") بنجاح!\nالمبلغ المخصوم: $" + ttPrice.toFixed(2) + "\nالرصيد المتبقي: $" + newBal.toFixed(2));
                 }
             } else {
-                alert("يرجى إدخال اليوزر نيم وكلمة السر لإتمام الشحن!");
+                alert("عذراً! رصيدك الحالي ($" + Number(currentUser.balance).toFixed(2) + ") غير كافٍ لشراء هذه الكمية ($" + ttPrice.toFixed(2) + ").");
             }
         }
     </script>
