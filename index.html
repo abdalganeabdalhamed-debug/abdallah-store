@@ -769,20 +769,22 @@
             return true;
         }
 
-        // تسجيل الطلبات بأسماء الأعمدة المباشرة والدقيقة 100%
+        // حفظ كل طلب في صف جديد (Row) منفصل ومستقل تماماً
         async function saveOrderToDB(serviceName, coins, price, targetAccount, waNumber) {
+            const newOrderData = {
+                user_name: String(currentUser.name),
+                user_email: String(currentUser.email),
+                service_name: String(serviceName),
+                coins_amount: Number(coins),
+                total_price: Number(price),
+                target_account: String(targetAccount),
+                whatsapp_number: String(waNumber),
+                status: 'pending'
+            };
+
             const { error } = await supabaseClient
                 .from('orders')
-                .insert([{
-                    user_name: currentUser.name,
-                    user_email: currentUser.email,
-                    service_name: serviceName,
-                    coins_amount: Number(coins),
-                    total_price: Number(price),
-                    target_account: String(targetAccount),
-                    whatsapp_number: String(waNumber),
-                    status: 'pending'
-                }]);
+                .insert([newOrderData]); // يضمن إنشاء صف جديد فريد كلياً
 
             if (error) {
                 console.error('حدث خطأ في حفظ الطلب:', error);
