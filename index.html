@@ -507,7 +507,16 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
-        let resetEmail = ""; // لتخزين بريد المستخدم عند إعادة تعيين كلمة السر
+        let resetEmail = "";
+
+        // عند تحميل الصفحة مفتاح الفحص للاستمرارية
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('store_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                loadStoreView();
+            }
+        });
 
         // التنقل بين الصفحات
         function hideAllPages() {
@@ -517,6 +526,13 @@
             document.getElementById('reset-password-page').style.display = 'none';
             document.getElementById('store-page').style.display = 'none';
             document.getElementById('deposit-page').style.display = 'none';
+        }
+
+        function loadStoreView() {
+            hideAllPages();
+            document.getElementById('store-page').style.display = 'block';
+            document.getElementById('user-name-display').textContent = currentUser.name;
+            document.getElementById('balance').textContent = Number(currentUser.balance).toFixed(2);
         }
 
         function showRegisterPage() {
@@ -587,7 +603,7 @@
             }
         });
 
-        // 2. تسجيل الدخول والتحقق من Supabase
+        // 2. تسجيل الدخول وحفظ الجلسة في localStorage
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -606,11 +622,9 @@
                 loginError.style.display = 'block';
             } else {
                 currentUser = data;
+                localStorage.setItem('store_user', JSON.stringify(currentUser)); // حفظ الحساب للمرات القادمة
                 loginError.style.display = 'none';
-                hideAllPages();
-                document.getElementById('store-page').style.display = 'block';
-                document.getElementById('user-name-display').textContent = currentUser.name;
-                document.getElementById('balance').textContent = Number(currentUser.balance).toFixed(2);
+                loadStoreView();
             }
         });
 
@@ -631,7 +645,7 @@
                 forgotError.style.display = 'block';
             } else {
                 forgotError.style.display = 'none';
-                resetEmail = email; // حفظ الإيميل للانتقال للخطوة التالية
+                resetEmail = email;
                 showResetPasswordPage();
             }
         });
@@ -668,11 +682,12 @@
 
         function logout() {
             currentUser = null;
+            localStorage.removeItem('store_user'); // مسح الحساب المحفوظ
             showLoginPage();
             document.getElementById('loginForm').reset();
         }
 
-        // تحديث الرصيد في قاعدة البيانات عند الشراء
+        // تحديث الرصيد في قاعدة البيانات وفي localStorage
         async function updateBalanceInDB(newBalance) {
             const { error } = await supabaseClient
                 .from('store_users')
@@ -685,6 +700,7 @@
                 return false;
             }
             currentUser.balance = newBalance;
+            localStorage.setItem('store_user', JSON.stringify(currentUser)); // تحديث الرصيد المحفوظ
             document.getElementById('balance').textContent = Number(newBalance).toFixed(2);
             return true;
         }
